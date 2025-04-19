@@ -12,7 +12,7 @@
     HelloClass hc = new HelloClass();
     String msg = hc.getMessage();
     %>
-
+    
 <p>Message from HelloClass: <%= msg %></p>
 
 </body>
