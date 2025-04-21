@@ -1,4 +1,4 @@
-package mypackage;
+package mypackage.models;
 
 public class HelloClass {
     public HelloClass() {

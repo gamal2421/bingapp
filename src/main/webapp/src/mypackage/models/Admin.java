@@ -1,4 +1,4 @@
-package mypackage;
+package mypackage.models;
 import java.util.Date;
 
 public class Admin extends User {

@@ -1,4 +1,4 @@
-package mypackage;
+package mypackage.models;
 import java.util.List;
 
 public class GameResult {

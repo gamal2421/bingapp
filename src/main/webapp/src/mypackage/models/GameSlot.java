@@ -1,4 +1,4 @@
-package mypackage;
+package mypackage.models;
 import java.sql.Time;
 
 public class GameSlot {
