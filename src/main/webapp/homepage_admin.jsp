@@ -70,6 +70,7 @@
             padding: 40px;
             gap: 40px;
             flex-wrap: wrap;
+            margin-top: -1px;
         }
 
         .slots-card {
@@ -84,8 +85,10 @@
             justify-content: space-between;
             height: 100%;
             animation: fadeInLeft 1s ease;
+            background-image: url("homepage_photo.png");
+            background-repeat: no-repeat;
+            background-size: cover;
         }
-
         .slots-card h2 {
             font-size: 28px;
             font-weight: 600;
@@ -94,10 +97,13 @@
         }
 
         .scroll-table {
-            max-height: 300px;
+            max-height: 270px;
             overflow-y: auto;
             border-radius: 10px;
             border: 1px solid #ddd;
+            background-color: 	rgba(255, 255, 255, 0.75);
+
+          
         }
 
         .scroll-table table {
@@ -293,11 +299,7 @@
     </div>
 
     <!-- Right: Image -->
-    <div class="image-box">
-        <div class="image-wrapper">
-            <img src="homepage_photo.png" alt="Ping Pong Game" class="main-image">
-        </div>
-    </div>
+ 
 </div>
 
 </body>
