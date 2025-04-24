@@ -34,4 +34,9 @@ public class Booking {
     public void setType(String type) {
         this.type = type;
     }
+
+    public void setStartTime(String string) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setStartTime'");
+    }
 }
