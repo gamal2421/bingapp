@@ -1,11 +1,15 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.*, java.text.SimpleDateFormat" %>
+
+<%@ page import="mypackage.models.User" %>
+<%@ page import="mypackage.utl.DataBase" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Book Your Game</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        * {
+              * {
             box-sizing: border-box;
         }
 
@@ -235,28 +239,38 @@
 <div class="line"></div>
 
 <div class="main-wrapper">
-    <!-- Left: Slots -->
     <div class="slots-card">
         <h2>Available Slots</h2>
         <div class="scroll-table">
             <table>
                 <tr><th>Date</th><th>Time Slot</th></tr>
-                <tr><td>April 24</td><td>5:00 PM - 5:10 PM</td></tr>
-                <tr><td>April 24</td><td>5:10 PM - 5:20 PM</td></tr>
-                <tr><td>April 24</td><td>5:20 PM - 5:30 PM</td></tr>
-                <tr><td>April 24</td><td>5:30 PM - 5:40 PM</td></tr>
-                <tr><td>April 24</td><td>5:40 PM - 5:50 PM</td></tr>
-                <tr><td>April 25</td><td>5:00 PM - 5:10 PM</td></tr>
-                <tr><td>April 25</td><td>5:10 PM - 5:20 PM</td></tr>
+                <%
+                    java.util.Date currentDate = new java.util.Date();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd");
+                    String todayFormatted = dateFormat.format(currentDate);
+                    
+                    List<String[]> availableSlots = User.seeAvailableSlots(currentDate);
+                    if (availableSlots != null && !availableSlots.isEmpty()) {
+                        for (String[] slot : availableSlots) {
+                %>
+                            <tr>
+                                <td><%= todayFormatted %></td>
+                                <td><%= slot[0] %> - <%= slot[1] %></td>
+                            </tr>
+                <%
+                        }
+                    } else {
+                %>
+                        <tr><td colspan="2">No available slots today.</td></tr>
+                <%
+                    }
+                %>
             </table>
         </div>
         <form action="booking_user.jsp" method="get">
             <button type="submit" class="book-btn">Book Now</button>
         </form>
     </div>
-
-    <!-- Right: Image -->
-   
 </div>
 
 </body>

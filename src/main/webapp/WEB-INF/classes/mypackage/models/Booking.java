@@ -1,14 +1,30 @@
 package mypackage.models;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import mypackage.utl.DataBase;
+
 public class Booking {
     private int bookingId;
-    private Date date;
-    private String type;
+    private Date gameDate;
+    private String startTime;
+    private String endTime;
+    private String gameType;
+   
 
-    public Booking(int bookingId, Date date, String type) {
+    public Booking(int bookingId, Date gameDate, String startTime, String endTime, String gameType) {
         this.bookingId = bookingId;
-        this.date = date;
-        this.type = type;
+        this.gameDate = gameDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.gameType = gameType;
+   
     }
 
     public int getBookingId() {
@@ -19,24 +35,37 @@ public class Booking {
         this.bookingId = bookingId;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getGameDate() {
+        return gameDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setGameDate(Date gameDate) {
+        this.gameDate = gameDate;
     }
 
-    public String getType() {
-        return type;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
-    public void setStartTime(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setStartTime'");
+    public String getEndTime() {
+        return endTime;
     }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getGameType() {
+        return gameType;
+    }
+
+    public void setGameType(String gameType) {
+        this.gameType = gameType;
+    }
+
+    
 }

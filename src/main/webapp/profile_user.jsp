@@ -1,7 +1,11 @@
-<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.io.File" %>
 <%@ page import="java.nio.file.Paths" %>
+<%@ page import="mypackage.models.User" %>
+<%@ page import="mypackage.models.Booking" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Date" %>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -92,7 +96,6 @@ body {
   height: 100%;
   object-fit: cover;
   animation: popIn 0.6s ease-out forwards;
-
   border-radius: 10px;
 }
 
@@ -322,7 +325,6 @@ body {
     align-items: center;
   }
 }
-
   </style>
 </head>
 <body>
@@ -339,32 +341,55 @@ body {
     <div class="profile-card">
         <div id="view-mode">
             <div class="avatar">
-                <!-- Display the updated avatar or a default avatar if not available -->
                 <img src="uploads/<%= session.getAttribute("avatar") != null ? session.getAttribute("avatar") : "avatar.jpeg" %>" alt="Profile" />
             </div>
-<div class="info">
-            <!-- Display updated username and email -->
-            <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %></h3>
-            <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "johndoe@example.com" %></p>
-        </div>
+            <div class="info">
+                <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %></h3>
+                <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "johndoe@example.com" %></p>
+            </div>
             <button class="edit-icon" onclick="openEditModal()">✎</button>
         </div>
     </div>
 
+    <%
+    Integer userId = (Integer) session.getAttribute("userId");
+    if (userId == null) {
+        out.println("User not logged in.");
+        return;
+    }
+
+    String firstName = "firstName";  // Fetch from DB based on userId
+    String lastName = "lastName";    
+    String gender = "gender";     
+    Date dob = new Date();      
+
+    User user = new User(userId, firstName, lastName, gender, dob);
+    List<Booking> bookedSlots = user.showBookedSlots(userId);
+    %>
+
     <div class="slots-card">
-      <h2>Upcoming Bookings</h2>
-      <div class="scroll-table">
-        <table>
-          <tr><th>Date</th><th>Time Slot</th></tr>
-          <tr><td>April 24</td><td>5:00 PM - 5:10 PM</td></tr>
-          <tr><td>April 24</td><td>5:10 PM - 5:20 PM</td></tr>
-          <tr><td>April 24</td><td>5:20 PM - 5:30 PM</td></tr>
-          <tr><td>April 24</td><td>5:30 PM - 5:40 PM</td></tr>
-          <tr><td>April 24</td><td>5:40 PM - 5:50 PM</td></tr>
-          <tr><td>April 25</td><td>5:00 PM - 5:10 PM</td></tr>
-          <tr><td>April 25</td><td>5:10 PM - 5:20 PM</td></tr>
-        </table>
-      </div>
+        <h2>Upcoming Bookings</h2>
+        <div class="scroll-table">
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Start time </th>
+                    <th>End time </th>
+                    <th>Game type</th>
+                </tr>
+                <% for (Booking booking : bookedSlots) { 
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMMM dd, yyyy");
+                    String formattedDate = dateFormat.format(booking.getGameDate());
+                %>
+                <tr>
+                    <td><%= formattedDate %></td>
+                    <td><%= booking.getStartTime()%></td>
+                    <td><%= booking.getEndTime() %></td>
+                    <td><%= booking.getGameType() %></td>
+                </tr>
+                <% } %>
+            </table>
+        </div>
     </div>
   </div>
 
@@ -372,21 +397,20 @@ body {
     <div class="modal-content">
         <span class="close-btn" onclick="closeEditModal()">×</span>
         <h2>Edit Profile</h2>
-
-        <!-- Form to handle the profile update -->
         <form method="post" action="profile_user.jsp" enctype="multipart/form-data">
-            <!-- File input for the avatar -->
             <input type="file" name="avatar" accept="image/*">
-            <!-- Text fields for the username and email -->
-            <input type="text" name="username" value="<%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %>">
-            <input type="email" name="email" value="<%= session.getAttribute("email") != null ? session.getAttribute("email") : "johndoe@example.com" %>">
+            <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %></h3>
+            <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "johndoe@example.com" %></p>
+            
             <div class="modal-buttons">
-                <button type="button" class="cancel" onclick="closeEditModal()">Cancel</button>
-                <button type="submit" class="save">Save Changes</button>
+              <button type="button" class="cancel" onclick="closeModal()">Cancel</button>
+              <button type="button" class="save" onclick="closeModal()">Save</button>
+
             </div>
         </form>
     </div>
-</div>
+  </div>
+
   <script>
     const modal = document.getElementById("editModal");
   
@@ -401,47 +425,42 @@ body {
       modal.classList.remove("show");
       setTimeout(() => {
         modal.style.display = "none";
-      }, 300); // Wait for animation to finish
+      }, 300);
     }
   
+    // This is where you call the function on the button click
     document.querySelector(".edit-icon").addEventListener("click", openModal);
   </script>
   
 </body>
 </html>
+
 <%
-    // Check if the form is submitted (POST request)
     if ("POST".equalsIgnoreCase(request.getMethod())) {
-        // Get the form parameters (username and email)
         String username = request.getParameter("username");
         String email = request.getParameter("email");
 
-        // Handle file upload (avatar)
-        Part avatarPart = request.getPart("avatar");  // Get the uploaded file
+        Part avatarPart = request.getPart("avatar");
         String avatarFileName = null;
 
         if (avatarPart != null && avatarPart.getSize() > 0) {
-            // Save the uploaded avatar file to the server
             String uploadPath = application.getRealPath("/") + "uploads/";
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
-                uploadDir.mkdir();  // Create the directory if it doesn't exist
+                uploadDir.mkdirs();
             }
 
-            avatarFileName = Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();  // Get the file name
+            avatarFileName = Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
             File file = new File(uploadPath + avatarFileName);
-            avatarPart.write(file.getAbsolutePath());  // Save the file to the server
+            avatarPart.write(file.getAbsolutePath());
         }
 
-        // Save the updated profile info in the session (or in a database)
         session.setAttribute("username", username);
         session.setAttribute("email", email);
         if (avatarFileName != null) {
             session.setAttribute("avatar", avatarFileName);
         }
 
-        // Redirect to the same page to display the updated profile
         response.sendRedirect("profile_user.jsp");
     }
 %>
-

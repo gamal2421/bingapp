@@ -1,4 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.*, mypackage.models.User" %>
+<%@ page import="mypackage.utl.DataBase" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +11,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <%
+    User user = new User(); // or use a static method if needed
+    List<String> employeeNames = user.getAllEmployeeFullNames();
+%>
+
+
   <style>
 body { 
   font-family: 'Poppins', sans-serif;
@@ -371,6 +381,7 @@ select:active {
     <a href="homepage_user.jsp">Home</a>
     <a href="booking_user.jsp">Book</a>
     <a href="profile_user.jsp">Profile</a>
+  
   </div>
 </div>
 <div class="line"></div>
@@ -401,17 +412,31 @@ select:active {
 
         <div class="opponent-container">
           <div class="time-slot-scroll">
-            <label  for="timeSlots" class="time-slot-label">Select Time Slots (max 5)</label>
+            <label for="timeSlots" class="time-slot-label">Select Time Slots (max 5)</label>
             <div>
-              <% 
-                String[] times = {"10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM","7:00 PM"};
-                for(String t : times){
-              %>
-              <label><input type="checkbox" name="timeSlots" value="<%=t%>" onchange="checkTimeSlotLimit()"> <%=t%></label><br>
-              <% } %>
+              <%
+              String dateStr = request.getParameter("date");
+              if (dateStr != null && !dateStr.isEmpty()) {
+                  java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                  java.util.Date selectedDate = formatter.parse(dateStr);
+          
+                  List<String[]> slots = mypackage.models.User.seeAvailableSlots(selectedDate);
+                  for (String[] slot : slots) {
+                      String timeDisplay = slot[0] + " - " + slot[1];
+          %>
+                      <option value="<%= timeDisplay %>"><%= timeDisplay %></option>
+          <%
+                  }
+              } else {
+          %>
+                  <option disabled selected>Please pick a date to see available time slots</option>
+          <%
+              }
+          %>
+          
             </div>
           </div>
-        
+          
           <div class="opponent-scroll" id="opponentContainer">
             <label for="searchOpponent" class="search-opponent-label">Search Opponent</label>
             <input type="text" id="searchOpponent" placeholder="Search opponent..." onkeyup="filterOpponents()">

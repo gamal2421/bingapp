@@ -1,3 +1,7 @@
+<%@ page import="java.util.*, java.text.SimpleDateFormat" %>
+
+<%@ page import="mypackage.models.User" %>
+<%@ page import="mypackage.utl.DataBase" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -5,7 +9,7 @@
     <title>Book Your Game</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        * {
+              * {
             box-sizing: border-box;
         }
 
@@ -24,6 +28,7 @@
             align-items: center;
             padding: 20px 40px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 0px;
         }
 
         .logo {
@@ -89,6 +94,7 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
+
         .slots-card h2 {
             font-size: 28px;
             font-weight: 600;
@@ -145,22 +151,24 @@
 
         .image-box {
             flex: 1;
-            min-width: 400px;
+            min-width: 550px;
             display: flex;
             align-items: center;
             justify-content: center;
             animation: fadeInRight 1s ease;
+            width: 100%;
         }
 
         .image-wrapper {
-            width: 100%;
-            max-width: 550px;
-            height: 532px;
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            transition: transform 0.4s ease;
-        }
+    width: 100%;
+    max-width: 550px;
+    height: 532px;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    transition: transform 0.4s ease;
+}
+
 
         .main-image {
             width: 100%;
@@ -170,48 +178,6 @@
 
         .image-wrapper:hover {
             transform: scale(1.03);
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            border-radius: 50%;
-            transition: .4s;
-        }
-        input:checked + .slider {
-            background-color: #4CAF50;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
         }
 
         /* Animations */
@@ -264,42 +230,48 @@
 <nav class="navbar">
     <div class="logo">KTG</div>
     <div class="nav-links">
-        <a href="homepage_admin.jsp">Home</a>
-        <a href="booking_admin.jsp">Book</a>
-        <a href="profile_admin.jsp">Profile</a>
-         <a href="report.jsp">Report</a>
-         <label class="switch">
-            <input type="checkbox" id="modeToggle">
-            <span class="slider"></span>
-        </label>
+        <a href="homepage_user.jsp">Home</a>
+        <a href="booking_user.jsp">Book</a>
+        <a href="profile_user.jsp">Profile</a>
+        <a href="report.jsp">Report</a>
     </div>
 </nav>
 
 <div class="line"></div>
 
 <div class="main-wrapper">
-    <!-- Left: Slots -->
     <div class="slots-card">
         <h2>Available Slots</h2>
         <div class="scroll-table">
             <table>
                 <tr><th>Date</th><th>Time Slot</th></tr>
-                <tr><td>April 24</td><td>5:00 PM - 5:10 PM</td></tr>
-                <tr><td>April 24</td><td>5:10 PM - 5:20 PM</td></tr>
-                <tr><td>April 24</td><td>5:20 PM - 5:30 PM</td></tr>
-                <tr><td>April 24</td><td>5:30 PM - 5:40 PM</td></tr>
-                <tr><td>April 24</td><td>5:40 PM - 5:50 PM</td></tr>
-                <tr><td>April 25</td><td>5:00 PM - 5:10 PM</td></tr>
-                <tr><td>April 25</td><td>5:10 PM - 5:20 PM</td></tr>
+                <%
+                    java.util.Date currentDate = new java.util.Date();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd");
+                    String todayFormatted = dateFormat.format(currentDate);
+                    
+                    List<String[]> availableSlots = User.seeAvailableSlots(currentDate);
+                    if (availableSlots != null && !availableSlots.isEmpty()) {
+                        for (String[] slot : availableSlots) {
+                %>
+                            <tr>
+                                <td><%= todayFormatted %></td>
+                                <td><%= slot[0] %> - <%= slot[1] %></td>
+                            </tr>
+                <%
+                        }
+                    } else {
+                %>
+                        <tr><td colspan="2">No available slots today.</td></tr>
+                <%
+                    }
+                %>
             </table>
         </div>
-        <form action="booking_admin.jsp" method="get">
+        <form action="booking_user.jsp" method="get">
             <button type="submit" class="book-btn">Book Now</button>
         </form>
     </div>
-
-    <!-- Right: Image -->
- 
 </div>
 
 </body>
