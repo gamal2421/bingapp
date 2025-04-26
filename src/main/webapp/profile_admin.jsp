@@ -25,8 +25,9 @@
 
     </div>
   </div>
+  <div class= "big">
 
-  <div class="profile-slots-container">
+  <div class="profile-slots-container"> 
     <div class="profile-card">
         <div id="view-mode">
             <div class="avatar">
@@ -82,23 +83,36 @@
     </div>
   </div>
 
-  <div class="modal" id="editModal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeEditModal()">×</span>
-        <h2>Edit Profile</h2>
-        <form method="post" action="profile_user.jsp" enctype="multipart/form-data">
-            <input type="file" name="avatar" accept="image/*">
-            <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %></h3>
-            <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "johndoe@example.com" %></p>
-            
-            <div class="modal-buttons">
-              <button type="button" class="cancel" onclick="closeModal()">Cancel</button>
-              <button type="button" class="save" onclick="closeModal()">Save</button>
+<div class="modal" id="editModal">
+  <div class="modal-content">
+      <span class="close-btn" onclick="closeEditModal()">×</span>
+      <h2>Edit Profile</h2>
+<form method="post" action="profile_admin.jsp" enctype="multipart/form-data">
+    <input type="file" name="avatar" accept="image/*">
 
-            </div>
-        </form>
+    <input 
+      type="text" 
+      name="username" 
+      value="<%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %>" 
+      required
+    >
+  
+    <input 
+      type="email" 
+      name="email" 
+      value="<%= session.getAttribute("email") != null ? session.getAttribute("email") : "johndoe@example.com" %>" 
+      readonly
+    >
+
+    <div class="modal-buttons">
+        <button type="button" class="cancel" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="save">Save</button>
     </div>
+</form>
+
   </div>
+</div>
+</div>
 
   <script>
     const modal = document.getElementById("editModal");

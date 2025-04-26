@@ -55,7 +55,7 @@
                 %>
             </table>
         </div>
-        <form action="booking_user.jsp" method="get">
+        <form action="booking_admin.jsp" method="get">
             <button type="submit" class="book-btn">Book Now</button>
         </form>
     </div>
