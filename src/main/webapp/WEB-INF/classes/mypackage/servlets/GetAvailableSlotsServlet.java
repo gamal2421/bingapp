@@ -1,5 +1,7 @@
 package mypackage.servlets;
 
+import mypackage.models.*;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -9,12 +11,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-@WebServlet("/GetAvailableSlotsServlet") // <<< Correct mapping to match fetch
+@WebServlet("/GetAvailableSlotsServlet")
 public class GetAvailableSlotsServlet extends HttpServlet {
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String dateStr = request.getParameter("date1");
+        String gender = request.getParameter("gender");  // <<<< get gender
 
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -24,7 +26,15 @@ public class GetAvailableSlotsServlet extends HttpServlet {
             try {
                 java.util.Date selectedDate = formatter.parse(dateStr);
 
-                List<String[]> slots = mypackage.models.User.seeAvailableSlots(selectedDate); // your DB call
+                List<String[]> slots;
+                if ("Male".equalsIgnoreCase(gender)) {
+                    slots = User.seeAvailableSlots(selectedDate); // for Male
+                } else if ("Female".equalsIgnoreCase(gender)) {
+                    slots = User.femaleAvailableSlots(selectedDate); // for Female
+                } else {
+                    out.println("<p>Invalid gender selected.</p>");
+                    return;
+                }
 
                 for (String[] slot : slots) {
                     String timeDisplay = slot[0] + " - " + slot[1];
