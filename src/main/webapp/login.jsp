@@ -31,13 +31,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="styles\login.css">
 </head>
 <body>
 
 <div class="container">
-    <img src="background_login.png
-    " alt="">
+    <img src="background_login.png" alt="">
     <form method="post" action="login.jsp" class="login-form">
         <input type="text" name="email" placeholder="Email" required class="username">
         <input type="password" name="password" placeholder="Password" required class="password">
