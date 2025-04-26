@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <%
-    User user = new User(); // or use a static method if needed
+    User user = new User(); 
     List<String> employeeNames = user.getAllEmployeeFullNames();
 %>
 
@@ -70,7 +70,7 @@
         </div>
         
       </div>
-      <button type="submit" class="btn-book">Confirm Booking</button>
+      <button type="submit" class="btn-book"> Confirm Booking </button>
     </form>
   </div>
 </div>

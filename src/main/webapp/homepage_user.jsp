@@ -34,7 +34,7 @@
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd");
                     String todayFormatted = dateFormat.format(currentDate);
                     
-                    List<String[]> availableSlots = User.seeAvailableSlots(currentDate);
+                    List<String[]> availableSlots = User.todayAvailableSlots(currentDate);
                     if (availableSlots != null && !availableSlots.isEmpty()) {
                         for (String[] slot : availableSlots) {
                 %>

@@ -109,9 +109,51 @@ public class User {
             e.printStackTrace();
         }
     }
-
-    // Method to see available game slots
+    // Method to see available game slots for male
     public static List<String[]> seeAvailableSlots(java.util.Date gameDate) {
+        List<String[]> slots = new ArrayList<>();
+        try (Connection conn = DataBase.getConnection()) {
+            String sql ="SELECT s.slot_id, s.start_time, s.end_time FROM slots s " + //
+                                "WHERE gender_group != 'female' and s.slot_id not in (SELECT slot_id from booking_game where status ='pending' and game_date = ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    String startTime = rs.getString("start_time");
+                    String endTime = rs.getString("end_time");
+                    slots.add(new String[]{startTime, endTime});
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return slots;
+    }
+     // Method to see available game slots for female
+     public static List<String[]> femaleAvailableSlots(java.util.Date gameDate) {
+        List<String[]> slots = new ArrayList<>();
+        try (Connection conn = DataBase.getConnection()) {
+            String sql ="SELECT s.slot_id, s.start_time, s.end_time FROM slots s " + //
+                                "WHERE s.slot_id not in (SELECT slot_id from booking_game where status ='pending' and game_date = ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    String startTime = rs.getString("start_time");
+                    String endTime = rs.getString("end_time");
+                    slots.add(new String[]{startTime, endTime});
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return slots;
+    }
+
+    // Method to see today's available game slots
+    public static List<String[]> todayAvailableSlots(java.util.Date gameDate) {
         List<String[]> slots = new ArrayList<>();
         try (Connection conn = DataBase.getConnection()) {
             String sql = "SELECT s.slot_id, s.start_time, s.end_time FROM slots s " +
