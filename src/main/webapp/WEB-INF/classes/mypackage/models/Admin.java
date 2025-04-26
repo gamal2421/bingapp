@@ -5,8 +5,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mypackage.utl.DataBase;
 
@@ -88,34 +91,39 @@ public void bookForOthers(int empId, Date gameDate, String gameType, int slotId)
 }
 
 
-    // View reports, e.g., daily/weekly/monthly booking stats or revenue
-    // View report of bookings and results for a given date range
-public void viewReport(Date startDate, Date endDate) {
-    try (Connection conn = DataBase.getConnection()) {
-        String sql = "SELECT b.game_date, b.game_type, b.status, g.result, e.first_name, e.last_name " +
-                     "FROM booking_game b " +
-                     "JOIN game_results g ON b.result_id = g.result_id " +
-                     "JOIN emp_master_data e ON b.booking_id IN (SELECT book_id FROM Emp_booking WHERE emp_id = e.emp_id) " +
-                     "WHERE b.game_date BETWEEN ? AND ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, new java.sql.Date(startDate.getTime()));
-            stmt.setDate(2, new java.sql.Date(endDate.getTime()));
+
+    // View report of bookings 
+    public static List<Map<String, String>> viewReport(Date date) {
+        List<Map<String, String>> reportList = new ArrayList<>();
+        String sql = "SELECT " +
+                     "s.start_time || '-' || s.end_time AS slot_time, " +
+                     "STRING_AGG(e.first_name || ' ' || e.last_name, ' : ' ORDER BY e.first_name) AS players " +
+                     "FROM emp_master_data e " +
+                     "JOIN emp_booking eb ON e.emp_id = eb.emp_id " +
+                     "JOIN booking_game b ON eb.book_id = b.booking_id " +
+                     "JOIN slots s ON b.slot_id = s.slot_id " +
+                     "WHERE b.game_date = ? " +
+                     "GROUP BY s.start_time, s.end_time " +
+                     "ORDER BY s.start_time";
+
+        try (Connection conn = DataBase.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDate(1, new java.sql.Date(date.getTime()));
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Date gameDate = rs.getDate("game_date");
-                String gameType = rs.getString("game_type");
-                String status = rs.getString("status");
-                String result = rs.getString("result");
-                String firstName = rs.getString("first_name");
-                String lastName = rs.getString("last_name");
-                System.out.println(gameDate + " | " + gameType + " | " + status + " | " + result + " | " + firstName + " " + lastName);
+                Map<String, String> record = new HashMap<>();
+                record.put("slot_time", rs.getString("slot_time"));
+                record.put("players", rs.getString("players"));
+                reportList.add(record);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return reportList;
     }
-}
+    
 
   // Modify the time slot for an existing booking
 public void modifySlot(int bookingId, int newSlotId) {

@@ -10,7 +10,7 @@
   <meta charset="UTF-8">
   <title>Booking</title>
 
-  <link rel="stylesheet" href="styles/booking_user.css">
+  <link rel="stylesheet" href="styles/booking_admin.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -22,7 +22,9 @@
 %>
 
 <!-- Your CSS here (same as you provided) -->
-
+<style>
+  /* (Keeping your CSS here as it is) */
+</style>
 
 </head>
 <body>
@@ -34,7 +36,7 @@
     <a href="homepage_admin.jsp">Home</a>
     <a href="booking_admin.jsp">Book</a>
     <a href="profile_admin.jsp">Profile</a>
-    <a href="report.jsp">report</a>
+    <a href="report.jsp">Report</a>
   </div>
 </div>
 
@@ -321,24 +323,32 @@ function filterOpponents() {
 
 document.addEventListener('DOMContentLoaded', function() {
     const dateInput = document.getElementById('date');
+    const genderSelect = document.getElementById('gender');
 
-    dateInput.addEventListener('change', function() {
+    function fetchAvailableSlots() {
         const selectedDate = dateInput.value;
-        
-        fetch('GetAvailableSlotsServlet', {   // This must match your servlet mapping
+        const selectedGender = genderSelect.value;
+
+        if (!selectedDate) return; // don't fetch if date not selected
+
+        fetch('GetAvailableSlotsServlet', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: 'date1=' + encodeURIComponent(selectedDate) // 'date1' matches in servlet
+            body: 'date1=' + encodeURIComponent(selectedDate) + '&gender=' + encodeURIComponent(selectedGender)
         })
         .then(response => response.text())
         .then(data => {
-            document.getElementById('timeSlotsContainer').innerHTML = data; // Assuming there is a div with id="timeSlotsContainer"
+            document.getElementById('timeSlotsContainer').innerHTML = data;
         })
         .catch(error => console.error('Error fetching slots:', error));
-    });
+    }
+
+    dateInput.addEventListener('change', fetchAvailableSlots);
+    genderSelect.addEventListener('change', fetchAvailableSlots); // fetch when gender changes too!
 });
+
 
 
 

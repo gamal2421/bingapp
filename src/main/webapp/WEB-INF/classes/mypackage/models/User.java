@@ -161,7 +161,7 @@ public class User {
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
                 ResultSet rs = stmt.executeQuery();
-
+                
                 while (rs.next()) {
                     String startTime = rs.getString("start_time");
                     String endTime = rs.getString("end_time");

@@ -17,9 +17,9 @@
 <nav class="navbar">
     <div class="logo">KTG</div>
     <div class="nav-links">
-        <a href="homepage_user.jsp">Home</a>
-        <a href="booking_user.jsp">Book</a>
-        <a href="profile_user.jsp">Profile</a>
+        <a href="homepage_admin.jsp">Home</a>
+        <a href="booking_admin.jsp">Book</a>
+        <a href="profile_admin.jsp">Profile</a>
         <a href="report.jsp">Report</a>
     </div>
 </nav>
