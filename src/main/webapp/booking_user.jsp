@@ -3,78 +3,100 @@
 <%@ page import="mypackage.utl.DataBase" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Booking</title>
-  <link rel="stylesheet" href="styles/booking_admin.css">
+
+  <link rel="stylesheet" href="styles/booking_user.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <%
-    User user = new User(); 
-    List<String> employeeNames = user.getAllEmployeeFullNames();
+  
+
+<%
+  User user = new User();
+  List<String> employeeNames = user.getAllEmployeeFullNames();
 %>
+
+<!-- Your CSS here (same as you provided) -->
+<style>
+  /* (Keeping your CSS here as it is) */
+</style>
 
 </head>
 <body>
 
+<!-- Navbar -->
 <div class="navbar">
   <div class="logo">KTG</div>
   <div class="nav-links">
     <a href="homepage_user.jsp">Home</a>
     <a href="booking_user.jsp">Book</a>
     <a href="profile_user.jsp">Profile</a>
-  
   </div>
 </div>
-<div class="line"></div>
 
+<!-- Main Section -->
 <div class="main-section">
   <div class="form-area">
     <h2>Booking</h2>
     <form id="bookingForm" action="ConfirmBookingServlet" method="post" onsubmit="return validateForm()">
+      
       <div class="booking-fields-container">
-        <div class="horizontal-group">
-          <div class="form-group date-group">
-            <label for="date">Date</label>
-            <div class="input-with-icon">
-              <input type="text" id="date" name="date1" required readonly >
-              <span class="calendar-icon" onclick="triggerCalendar()">📅</span>
-            </div>
-          </div>
-          
-          
-          <div class="form-group">
-            <label for="type">Game Type</label>
-            <select id="type" name="type" onchange="updateOpponentSelect()" required>
-              <option value="Double">Double</option>
-              <option value="Squad">Squad</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="opponent-container">
-          <div class="time-slot-scroll" id="timeSlotsContainer">
-              <label>Select Time Slots (max 5)</label>
-              <p>Please pick a date to see available time slots</p>
-          </div>
-          </div>
-          
-          <div class="opponent-scroll" id="opponentContainer">
-            <label for="searchOpponent" class="search-opponent-label">Search Opponent</label>
-            <input type="text" id="searchOpponent" placeholder="Search opponent..." onkeyup="filterOpponents()">
-            <div  id="opponentList"></div>
-          </div>
-        </div>
         
-      </div>
-      <button type="submit" class="btn-book"> Confirm Booking </button>
-    </form>
+<div class="horizontal-group">
+  <div class="form-group">
+    <label for="gender">Gender</label>
+    <select id="gender" name="gender" required>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+  </div>
+
+  <div class="form-group date-group">
+    <label for="date">Date</label>
+    <div class="input-with-icon">
+      <input type="text" id="date" name="date1" required readonly>
+      <span class="calendar-icon" onclick="triggerCalendar()">📅</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="type">Game Type</label>
+    <select id="type" name="type" onchange="updateOpponentSelect()" required>
+      <option value="Double">Double</option>
+      <option value="Squad">Squad</option>
+    </select>
   </div>
 </div>
 
+        <div class="opponent-container">
+          
+          <div class="time-slot-scroll" id="timeSlotsContainer">
+            <label>Select Time Slots (max 5)</label>
+            <p>Please pick a date to see available time slots</p>
+          </div>
+
+          <div class="opponent-scroll" id="opponentContainer">
+            <label for="searchOpponent" class="search-opponent-label">Search Opponent</label>
+            <input type="text" id="searchOpponent" placeholder="Search opponent..." onkeyup="filterOpponents()">
+            <div id="opponentList"></div>
+          </div>
+
+        </div> <!-- close opponent-container -->
+
+      </div> <!-- close booking-fields-container -->
+
+      <button type="submit" class="btn-book">Confirm Booking</button>
+
+    </form>
+  </div> <!-- close form-area -->
+</div> <!-- close main-section -->
+
+<!-- JavaScript -->
 <script>
   const players = [
     <% for (String name : employeeNames) { %>

@@ -28,7 +28,7 @@ public class GetAvailableSlotsServlet extends HttpServlet {
 
                 for (String[] slot : slots) {
                     String timeDisplay = slot[0] + " - " + slot[1];
-                    out.println("<div><input type='checkbox' name='timeSlots' value='" + timeDisplay + "'> " + timeDisplay + "</div>");
+                    out.println("<div><input type='checkbox' name='timeSlots' onchange='checkTimeSlotLimit()' value='" + timeDisplay + "'> " + timeDisplay + "</div>");
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
