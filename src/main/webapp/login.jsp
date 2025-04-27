@@ -22,16 +22,17 @@
                 response.sendRedirect("homepage_user.jsp");
             }
             return;
+        } else {
+            message = "Invalid email or password. Please try again.";
         }
     }
-        
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="styles\login.css">
+    <link rel="stylesheet" href="styles/login.css">
 </head>
 <body>
 
@@ -41,7 +42,7 @@
         <input type="text" name="email" placeholder="Email" required class="username">
         <input type="password" name="password" placeholder="Password" required class="password">
         <button type="submit" class="button1">Login</button>
-        <p style="color:red;"><%= message %></p>
+        <p style="color:red;"><%= message %></p> <!-- Show error message if any -->
     </form>
 </div>
 </body>
