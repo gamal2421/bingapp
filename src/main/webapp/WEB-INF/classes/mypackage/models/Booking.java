@@ -16,14 +16,19 @@ public class Booking {
     private String startTime;
     private String endTime;
     private String gameType;
+    private int slotId;
+    private String status;
+
+    
    
 
-    public Booking(int bookingId, Date gameDate, String startTime, String endTime, String gameType) {
+    public Booking(int bookingId, Date gameDate, String startTime, String endTime, String gameType,  String status) {
         this.bookingId = bookingId;
         this.gameDate = gameDate;
         this.startTime = startTime;
         this.endTime = endTime;
         this.gameType = gameType;
+        this.status = status;
    
     }
 
@@ -67,5 +72,21 @@ public class Booking {
         this.gameType = gameType;
     }
 
-    
+    public int getSlotId() {
+        return slotId;
+    }
+
+    public void setSlotId(int slotId) {
+        this.slotId = slotId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+}
+
+
 }

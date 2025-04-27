@@ -175,30 +175,23 @@ public class User {
     }
 
     // Method to cancel a booked slot
-    public void cancelSlot(int bookingId) {
+    public void cancelBooking(int bookingId) {
         try (Connection conn = DataBase.getConnection()) {
-            String empBookingSql = "DELETE FROM Emp_booking WHERE book_id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(empBookingSql)) {
-                stmt.setInt(1, bookingId);
-                stmt.executeUpdate();
-            }
-
-            String bookingSql = "DELETE FROM booking_game WHERE booking_id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(bookingSql)) {
-                stmt.setInt(1, bookingId);
-                stmt.executeUpdate();
-                System.out.println("Booking ID " + bookingId + " has been canceled.");
+            String updateSql = "UPDATE booking_game SET status = 'cancelled' WHERE booking_id = ?";
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                updateStmt.setInt(1, bookingId);
+                updateStmt.executeUpdate();
+                System.out.println("Booking cancelled for booking_id: " + bookingId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
     // Method to show booked game slots
     public List<Booking> showBookedSlots(int empId) {
         List<Booking> bookings = new ArrayList<>();
         try (Connection conn = DataBase.getConnection()) {
-            String sql = "SELECT b.booking_id, b.game_date, s.start_time, s.end_time, b.game_type " +
+            String sql = "SELECT b.booking_id, b.game_date, s.start_time, s.end_time, b.game_type, b.status " +
                          "FROM booking_game b JOIN slots s ON b.slot_id = s.slot_id " +
                          "WHERE b.booking_id IN (SELECT book_id FROM Emp_booking WHERE emp_id = ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -210,7 +203,9 @@ public class User {
                     String startTime = rs.getString("start_time");
                     String endTime = rs.getString("end_time");
                     String gameType = rs.getString("game_type");
-                    bookings.add(new Booking(bookingId, gameDate, startTime, endTime, gameType));
+                    String status = rs.getString("status");
+
+                    bookings.add(new Booking(bookingId, gameDate, startTime, endTime, gameType, status));
                 }
             }
         } catch (SQLException e) {
@@ -259,5 +254,5 @@ public class User {
 
     public void setDob(Date dob) {
         this.dob = dob;
-    }
+ }
 }

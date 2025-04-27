@@ -5,13 +5,44 @@
 <%@ page import="mypackage.models.Booking" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="mypackage.utl.DataBase" %> 
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.PreparedStatement" %>
+
+<%
+    request.setCharacterEncoding("UTF-8"); // just in case
+
+    String deleteBookingIdStr = request.getParameter("deleteBookingId");
+    if (deleteBookingIdStr != null) {
+        try {
+            int bookingId = Integer.parseInt(deleteBookingIdStr);
+
+            Integer currentUserId = (Integer) session.getAttribute("userId");
+            if (currentUserId != null) {
+                // Create User object (even with dummy data, because we only need the method)
+                User userForDeletion = new User();
+                userForDeletion.cancelBooking(bookingId);
+                
+                // Optional: Refresh the page after deletion
+                response.sendRedirect("profile_admin.jsp");
+                return;
+            } else {
+                out.println("User not logged in.");
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            out.println("Invalid booking ID.");
+        }
+    }
+%>
+
 
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile & Available Slots</title>
-  <link rel="stylesheet" href="styles\profile_user.css">
+  <link rel="stylesheet" href="styles\profile_admin.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -21,10 +52,13 @@
       <a href="homepage_user.jsp">Home</a>
       <a href="booking_user.jsp">Book</a>
       <a href="profile_user.jsp">Profile</a>
+   
+
     </div>
   </div>
+  <div class= "big">
 
-  <div class="profile-slots-container">
+  <div class="profile-slots-container"> 
     <div class="profile-card">
         <div id="view-mode">
             <div class="avatar">
@@ -55,36 +89,48 @@
     %>
 
     <div class="slots-card">
-        <h2>Upcoming Bookings</h2>
-        <div class="scroll-table">
-            <table>
-                <tr>
-                    <th>Date</th>
-                    <th>Start time </th>
-                    <th>End time </th>
-                    <th>Game type</th>
-                </tr>
-                <% for (Booking booking : bookedSlots) { 
-                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMMM dd, yyyy");
-                    String formattedDate = dateFormat.format(booking.getGameDate());
-                %>
-                <tr>
-                    <td><%= formattedDate %></td>
-                    <td><%= booking.getStartTime()%></td>
-                    <td><%= booking.getEndTime() %></td>
-                    <td><%= booking.getGameType() %></td>
-                </tr>
-                <% } %>
-            </table>
-        </div>
+    <h2>Upcoming Bookings</h2>
+    <div class="scroll-table">
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Start time</th>
+                <th>End time</th>
+                <th>Game type</th>
+                 <th>Status</th>
+                 <th>Action</th>
+                 <!-- New column for delete button -->
+            </tr>
+            <% for (Booking booking : bookedSlots) { 
+                java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMMM dd, yyyy");
+                String formattedDate = dateFormat.format(booking.getGameDate());
+            %>
+            <tr>
+                <td><%= formattedDate %></td>
+                <td><%= booking.getStartTime() %></td>
+                <td><%= booking.getEndTime() %></td>
+                <td><%= booking.getGameType() %></td>
+                <td><%= booking.getStatus() %></td>
+
+                <td>
+                    <form method="post" action="profile_admin.jsp" style="display:inline;">
+                        <input type="hidden" name="deleteBookingId" value="<%= booking.getBookingId() %>">
+                        <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <% } %>
+        </table>
     </div>
+</div>
+
   </div>
 
 <div class="modal" id="editModal">
   <div class="modal-content">
       <span class="close-btn" onclick="closeEditModal()">×</span>
       <h2>Edit Profile</h2>
-  <form method="post" action="profile_user.jsp" enctype="multipart/form-data">
+<form method="post" action="profile_admin.jsp" enctype="multipart/form-data">
     <input type="file" name="avatar" accept="image/*">
 
     <input 
@@ -108,6 +154,7 @@
 </form>
 
   </div>
+</div>
 </div>
 
   <script>
@@ -160,6 +207,6 @@
             session.setAttribute("avatar", avatarFileName);
         }
 
-        response.sendRedirect("profile_user.jsp");
+        response.sendRedirect("profile_admin.jsp");
     }
 %>

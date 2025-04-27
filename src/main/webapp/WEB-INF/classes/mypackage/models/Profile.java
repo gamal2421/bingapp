@@ -61,7 +61,8 @@ public class Profile {
                         rs.getDate("game_date"),
                         rs.getString("game_type"),
                         rs.getString("start_time"),
-                        rs.getString("end_time")
+                        rs.getString("end_time"),
+                        rs.getString("status")
                     );
                     bookings.add(booking);
                 }
@@ -82,5 +83,5 @@ public class Profile {
 
     public void setUserId(int userId) {
         this.userId = userId;
-    }
+ }
 }

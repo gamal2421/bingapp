@@ -184,7 +184,7 @@ public void switchTime(int bookingId, int currentSlotId) {
         }
     } catch (SQLException e) {
         e.printStackTrace();
-    }
+   }
 }
 
 }

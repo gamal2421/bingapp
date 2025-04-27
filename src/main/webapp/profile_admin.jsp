@@ -5,6 +5,37 @@
 <%@ page import="mypackage.models.Booking" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="mypackage.utl.DataBase" %> 
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.PreparedStatement" %>
+
+<%
+    request.setCharacterEncoding("UTF-8"); // just in case
+
+    String deleteBookingIdStr = request.getParameter("deleteBookingId");
+    if (deleteBookingIdStr != null) {
+        try {
+            int bookingId = Integer.parseInt(deleteBookingIdStr);
+
+            Integer currentUserId = (Integer) session.getAttribute("userId");
+            if (currentUserId != null) {
+                // Create User object (even with dummy data, because we only need the method)
+                User userForDeletion = new User();
+                userForDeletion.cancelBooking(bookingId);
+                
+                // Optional: Refresh the page after deletion
+                response.sendRedirect("profile_admin.jsp");
+                return;
+            } else {
+                out.println("User not logged in.");
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            out.println("Invalid booking ID.");
+        }
+    }
+%>
+
 
 <html lang="en">
 <head>
@@ -18,9 +49,9 @@
   <div class="navbar">
     <div class="logo">KTG</div>
     <div class="nav-links">
-      <a href="homepage_user.jsp">Home</a>
-      <a href="booking_user.jsp">Book</a>
-      <a href="profile_user.jsp">Profile</a>
+      <a href="homepage_admin.jsp">Home</a>
+      <a href="booking_admin.jsp">Book</a>
+      <a href="profile_admin.jsp">Profile</a>
       <a href="report.jsp">Report</a>
 
     </div>
@@ -58,29 +89,41 @@
     %>
 
     <div class="slots-card">
-        <h2>Upcoming Bookings</h2>
-        <div class="scroll-table">
-            <table>
-                <tr>
-                    <th>Date</th>
-                    <th>Start time </th>
-                    <th>End time </th>
-                    <th>Game type</th>
-                </tr>
-                <% for (Booking booking : bookedSlots) { 
-                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMMM dd, yyyy");
-                    String formattedDate = dateFormat.format(booking.getGameDate());
-                %>
-                <tr>
-                    <td><%= formattedDate %></td>
-                    <td><%= booking.getStartTime()%></td>
-                    <td><%= booking.getEndTime() %></td>
-                    <td><%= booking.getGameType() %></td>
-                </tr>
-                <% } %>
-            </table>
-        </div>
+    <h2>Upcoming Bookings</h2>
+    <div class="scroll-table">
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Start time</th>
+                <th>End time</th>
+                <th>Game type</th>
+                 <th>Status</th>
+                 <th>Action</th>
+                 <!-- New column for delete button -->
+            </tr>
+            <% for (Booking booking : bookedSlots) { 
+                java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMMM dd, yyyy");
+                String formattedDate = dateFormat.format(booking.getGameDate());
+            %>
+            <tr>
+                <td><%= formattedDate %></td>
+                <td><%= booking.getStartTime() %></td>
+                <td><%= booking.getEndTime() %></td>
+                <td><%= booking.getGameType() %></td>
+                <td><%= booking.getStatus() %></td>
+
+                <td>
+                    <form method="post" action="profile_admin.jsp" style="display:inline;">
+                        <input type="hidden" name="deleteBookingId" value="<%= booking.getBookingId() %>">
+                        <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <% } %>
+        </table>
     </div>
+</div>
+
   </div>
 
 <div class="modal" id="editModal">
@@ -96,7 +139,7 @@
       value="<%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %>" 
       required
     >
-  
+
     <input 
       type="email" 
       name="email" 
