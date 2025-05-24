@@ -1,0 +1,9 @@
+mypackage\models\Admin.class
+mypackage\models\Profile.class
+mypackage\models\Booking.class
+mypackage\servlets\GetAvailableSlotsServlet.class
+mypackage\utl\DataBase.class
+mypackage\models\User.class
+mypackage\models\GameSlot.class
+mypackage\models\RegularEmployee.class
+mypackage\models\GameResult.class
