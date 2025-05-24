@@ -40,7 +40,7 @@ public class User {
     }
 
     // Method to login user
-    public boolean login(String email, String password) {
+    public boolean login(String email, String password) throws SQLException {
         String sql = "SELECT * FROM emp_master_data WHERE email = ? AND password = ?";
         try (Connection conn = DataBase.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -54,12 +54,10 @@ public class User {
                     this.lastName  = rs.getString("last_name");
                     this.gender    = rs.getString("gender");
                     this.dob       = rs.getDate("dob");
-                    this.role      = rs.getString("role"); // 🔥 Add this line!
+                    this.role      = rs.getString("role"); 
                     return true;
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return false;
     }

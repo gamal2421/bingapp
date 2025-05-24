@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DataBase {
-    private static final String URL = "jdbc:postgresql://ballast.proxy.rlwy.net:33890/railway";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "DlETyzLBsPNeETaKhIcpzAdmlNHASjZc";
+    private static final String URL = "jdbc:postgresql://pg-204c693f-waleedgamal2821-a9bd.f.aivencloud.com:14381/defaultdb?sslmode=require";
+    private static final String USER = "avnadmin";
+    private static final String PASSWORD = "AVNS_4K6aK5QsXXUYxk4LVoY";
 
     public static Connection getConnection() throws SQLException {
         try {
@@ -19,3 +19,4 @@ public class DataBase {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
+
