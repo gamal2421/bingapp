@@ -31,15 +31,4 @@
         </taglib>
     </jsp-config>
 
-    <!-- ConfirmBookingServlet -->
-    <servlet>
-        <servlet-name>ConfirmBookingServlet</servlet-name>
-        <servlet-class>com.example.ConfirmBookingServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>ConfirmBookingServlet</servlet-name>
-        <url-pattern>/ConfirmBookingServlet</url-pattern>
-    </servlet-mapping>
-
 </web-app>

@@ -118,9 +118,10 @@ public class User {
                 ResultSet rs = stmt.executeQuery();
 
                 while (rs.next()) {
+                    int slotId = rs.getInt("slot_id");
                     String startTime = rs.getString("start_time");
                     String endTime = rs.getString("end_time");
-                    slots.add(new String[]{startTime, endTime});
+                    slots.add(new String[]{startTime, endTime, String.valueOf(slotId)});
                 }
             }
         } catch (Exception e) {
@@ -139,9 +140,10 @@ public class User {
                 ResultSet rs = stmt.executeQuery();
 
                 while (rs.next()) {
+                    int slotId = rs.getInt("slot_id");
                     String startTime = rs.getString("start_time");
                     String endTime = rs.getString("end_time");
-                    slots.add(new String[]{startTime, endTime});
+                    slots.add(new String[]{startTime, endTime, String.valueOf(slotId)});
                 }
             }
         } catch (Exception e) {
@@ -212,6 +214,25 @@ public class User {
         return bookings;
     }
     
+
+    // Method to get employee ID by full name
+    public static int getEmployeeIdByName(String fullName) {
+        int empId = -1; // Default to -1 if not found
+        String sql = "SELECT emp_id FROM emp_master_data WHERE first_name || ' ' || last_name = ?";
+
+        try (Connection conn = DataBase.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, fullName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    empId = rs.getInt("emp_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return empId;
+    }
 
     // Getter and setter methods for the User fields
     public int getId() {
