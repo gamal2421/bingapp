@@ -36,24 +36,21 @@ public class ConfirmBookingServlet extends HttpServlet {
         } else if ("Squad".equals(gameType)) {
             opponentNames = request.getParameterValues("opponents");
         } else {
-            // Invalid game type
-            response.sendRedirect("error.jsp"); // Redirect to an error page
+            response.sendRedirect("error.jsp");
             return;
         }
 
         if (timeSlots == null || timeSlots.length == 0 || opponentNames == null || opponentNames.length == 0) {
-            // No time slots or opponents selected
-            response.sendRedirect("error.jsp"); // Redirect to an error page
+            response.sendRedirect("error.jsp");
             return;
         }
 
-        // Get admin's user ID from session
         HttpSession session = request.getSession();
-        Integer adminUserId = (Integer) session.getAttribute("userId"); // Assuming user ID is stored as "userId"
+        Integer adminUserId = (Integer) session.getAttribute("userId");
+        String userRole = (String) session.getAttribute("role"); // Get role from session
 
-        if (adminUserId == null) {
-            // User not logged in or session expired
-            response.sendRedirect("login.jsp"); // Redirect to login page
+        if (adminUserId == null || userRole == null) {
+            response.sendRedirect("login.jsp");
             return;
         }
 
@@ -63,11 +60,8 @@ public class ConfirmBookingServlet extends HttpServlet {
             if (empId != -1) {
                 opponentEmpIds.add(empId);
             } else {
-                // Opponent not found, handle error (e.g., log, redirect)
                 System.err.println("Opponent not found: " + opponentName);
-                // Depending on requirements, you might want to stop the booking or log and continue
-                // For now, let's assume all selected opponents must be found
-                response.sendRedirect("error.jsp"); // Redirect to an error page
+                response.sendRedirect("error.jsp");
                 return;
             }
         }
@@ -79,14 +73,14 @@ public class ConfirmBookingServlet extends HttpServlet {
             gameDate = new Date(utilDate.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp"); // Redirect to an error page
+            response.sendRedirect("error.jsp");
             return;
         }
 
         Connection conn = null;
         try {
             conn = DataBase.getConnection();
-            conn.setAutoCommit(false); // Start transaction
+            conn.setAutoCommit(false);
 
             String bookingGameSql = "INSERT INTO booking_game (game_date, game_type, status, slot_id) VALUES (?, ?, ?, ?)";
             String empBookingSql = "INSERT INTO Emp_booking (emp_id, book_id) VALUES (?, ?)";
@@ -94,11 +88,10 @@ public class ConfirmBookingServlet extends HttpServlet {
             for (String slotIdStr : timeSlots) {
                 int slotId = Integer.parseInt(slotIdStr);
 
-                // Insert into booking_game
                 try (PreparedStatement bookingStmt = conn.prepareStatement(bookingGameSql, Statement.RETURN_GENERATED_KEYS)) {
                     bookingStmt.setDate(1, gameDate);
                     bookingStmt.setString(2, gameType);
-                    bookingStmt.setString(3, "pending"); // Assuming status is pending initially
+                    bookingStmt.setString(3, "pending");
                     bookingStmt.setInt(4, slotId);
                     bookingStmt.executeUpdate();
 
@@ -110,14 +103,12 @@ public class ConfirmBookingServlet extends HttpServlet {
                         throw new SQLException("Creating booking_game failed, no generated key obtained.");
                     }
 
-                    // Insert into emp_booking for the admin
                     try (PreparedStatement empBookingStmt = conn.prepareStatement(empBookingSql)) {
                         empBookingStmt.setInt(1, adminUserId);
                         empBookingStmt.setInt(2, bookingId);
                         empBookingStmt.executeUpdate();
                     }
 
-                    // Insert into emp_booking for each opponent
                     for (int opponentEmpId : opponentEmpIds) {
                         try (PreparedStatement empBookingStmt = conn.prepareStatement(empBookingSql)) {
                             empBookingStmt.setInt(1, opponentEmpId);
@@ -128,23 +119,29 @@ public class ConfirmBookingServlet extends HttpServlet {
                 }
             }
 
-            conn.commit(); // Commit transaction
-            response.sendRedirect("homepage_admin.jsp"); // Redirect to a success page
+            conn.commit();
+
+            // ✅ Redirect based on user role
+            if ("admin".equalsIgnoreCase(userRole)) {
+                response.sendRedirect("homepage_admin.jsp");
+            } else {
+                response.sendRedirect("homepage_user.jsp");
+            }
 
         } catch (SQLException e) {
             try {
                 if (conn != null) {
-                    conn.rollback(); // Rollback transaction on error
+                    conn.rollback();
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
             e.printStackTrace();
-            response.sendRedirect("error.jsp"); // Redirect to an error page
+            response.sendRedirect("error.jsp");
         } finally {
             try {
                 if (conn != null) {
-                    conn.setAutoCommit(true); // Restore auto-commit
+                    conn.setAutoCommit(true);
                     conn.close();
                 }
             } catch (SQLException e) {
@@ -152,4 +149,4 @@ public class ConfirmBookingServlet extends HttpServlet {
             }
         }
     }
-} 
+}

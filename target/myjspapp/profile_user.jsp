@@ -65,8 +65,8 @@
                 <img src="uploads/<%= session.getAttribute("avatar") != null ? session.getAttribute("avatar") : "avatar.jpeg" %>" alt="Profile" />
             </div>
             <div class="info">
-                <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %></h3>
-                <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "johndoe@example.com" %></p>
+                <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "NO User Name" %></h3>
+                <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "No Email" %></p>
             </div>
             <button class="edit-icon" onclick="openEditModal()">✎</button>
         </div>
@@ -128,22 +128,22 @@
 
 <div class="modal" id="editModal">
   <div class="modal-content">
-      <span class="close-btn" onclick="closeEditModal()">×</span>
+      <span class="close-btn" onclick="closeModal()">×</span>
       <h2>Edit Profile</h2>
-<form method="post" action="profile_admin.jsp" enctype="multipart/form-data">
+<form method="post" action="profile_user.jsp" enctype="multipart/form-data">
     <input type="file" name="avatar" accept="image/*">
 
     <input 
       type="text" 
       name="username" 
-      value="<%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %>" 
+      value="<%= session.getAttribute("username") != null ? session.getAttribute("username") : "NO User Name" %>" 
       required
     >
 
     <input 
       type="email" 
       name="email" 
-      value="<%= session.getAttribute("email") != null ? session.getAttribute("email") : "johndoe@example.com" %>" 
+      value="<%= session.getAttribute("email") != null ? session.getAttribute("email") : "No Email" %>" 
       readonly
     >
 
@@ -207,6 +207,6 @@
             session.setAttribute("avatar", avatarFileName);
         }
 
-        response.sendRedirect("profile_admin.jsp");
+        response.sendRedirect("profile_user.jsp");
     }
 %>

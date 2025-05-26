@@ -8,7 +8,7 @@
     if ("POST".equalsIgnoreCase(request.getMethod())) {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-
+        
         User user = new User();
         try {
             if (user.login(email, password)) {
