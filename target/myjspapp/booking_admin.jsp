@@ -18,12 +18,25 @@
 
 <%
 User user = (User) session.getAttribute("loggedInUser");
+
 String userGender = "Unknown";
 if (user != null && user.getGender() != null) {
     userGender = user.getGender();
 }
+    List<String> employeeNames = user.getAllEmployeeFullNames();
 
-List<String> employeeNames = user.getAllEmployeeFullNames();
+    String username = (String) session.getAttribute("username");
+   
+  
+
+    // Remove the logged-in user from the list, trimming and ignoring case
+    List<String> toRemove = new ArrayList<>();
+    for (String emp : employeeNames) {
+        if (emp.trim().equalsIgnoreCase(username.trim())) {
+            toRemove.add(emp);
+        }
+    }
+    employeeNames.removeAll(toRemove);
 
 %>
 
