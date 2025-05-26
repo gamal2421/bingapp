@@ -17,8 +17,14 @@
   
 
 <%
-  User user = new User();
-  List<String> employeeNames = user.getAllEmployeeFullNames();
+User user = (User) session.getAttribute("loggedInUser");
+String userGender = "Unknown";
+if (user != null && user.getGender() != null) {
+    userGender = user.getGender();
+}
+
+List<String> employeeNames = user.getAllEmployeeFullNames();
+
 %>
 
 <!-- Your CSS here (same as you provided) -->
@@ -49,13 +55,7 @@
       <div class="booking-fields-container">
         
 <div class="horizontal-group">
-  <div class="form-group">
-    <label for="gender">Gender</label>
-    <select id="gender" name="gender" required>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-    </select>
-  </div>
+ 
 
   <div class="form-group date-group">
     <label for="date">Date</label>
@@ -99,6 +99,7 @@
 
 <!-- JavaScript -->
 <script>
+ const gender = "<%= userGender %>";
   const players = [
     <% for (String name : employeeNames) { %>
       "<%= name %>",
@@ -327,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function fetchAvailableSlots() {
         const selectedDate = dateInput.value;
-        const selectedGender = genderSelect.value;
+        const selectedGender = gender;
 
         if (!selectedDate) return; // don't fetch if date not selected
 
@@ -346,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     dateInput.addEventListener('change', fetchAvailableSlots);
-    genderSelect.addEventListener('change', fetchAvailableSlots); // fetch when gender changes too!
+  // fetch when gender changes too!
 });
 
 

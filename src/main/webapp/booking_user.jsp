@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+ <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*, mypackage.models.User" %>
 <%@ page import="mypackage.utl.DataBase" %>
 <%@ page import="java.util.List" %>
@@ -14,11 +14,28 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<%
+User user = (User) session.getAttribute("loggedInUser");
+
+String userGender = "Unknown";
+if (user != null && user.getGender() != null) {
+    userGender = user.getGender();
+}
+    List<String> employeeNames = user.getAllEmployeeFullNames();
+
+    String username = (String) session.getAttribute("username");
+   
   
 
-<%
-  User user = new User();
-  List<String> employeeNames = user.getAllEmployeeFullNames();
+    // Remove the logged-in user from the list, trimming and ignoring case
+    List<String> toRemove = new ArrayList<>();
+    for (String emp : employeeNames) {
+        if (emp.trim().equalsIgnoreCase(username.trim())) {
+            toRemove.add(emp);
+        }
+    }
+    employeeNames.removeAll(toRemove);
+
 %>
 
 <!-- Your CSS here (same as you provided) -->
@@ -38,6 +55,12 @@
     <a href="profile_user.jsp">Profile</a>
   </div>
 </div>
+<% if (request.getAttribute("errorMessage") != null) { %>
+    <div style="color: red; font-weight: bold; padding: 10px;">
+        <%= request.getAttribute("errorMessage") %>
+    </div>
+<% } %>
+
 
 <!-- Main Section -->
 <div class="main-section">
@@ -48,13 +71,7 @@
       <div class="booking-fields-container">
         
 <div class="horizontal-group">
-  <div class="form-group">
-    <label for="gender">Gender</label>
-    <select id="gender" name="gender" required>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-    </select>
-  </div>
+ 
 
   <div class="form-group date-group">
     <label for="date">Date</label>
@@ -98,6 +115,7 @@
 
 <!-- JavaScript -->
 <script>
+  const gender = "<%= userGender %>";
   const players = [
     <% for (String name : employeeNames) { %>
       "<%= name %>",
@@ -326,7 +344,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function fetchAvailableSlots() {
         const selectedDate = dateInput.value;
-        const selectedGender = genderSelect.value;
+     const selectedGender = gender;
+
 
         if (!selectedDate) return; // don't fetch if date not selected
 
@@ -345,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     dateInput.addEventListener('change', fetchAvailableSlots);
-    genderSelect.addEventListener('change', fetchAvailableSlots); // fetch when gender changes too!
+  // fetch when gender changes too!
 });
 
 

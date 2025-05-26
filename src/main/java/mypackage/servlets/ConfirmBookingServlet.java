@@ -26,6 +26,8 @@ public class ConfirmBookingServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+       System.out.println("ConfirmBookingServlet.doPost() called");
+
         String dateStr = request.getParameter("date1");
         String gameType = request.getParameter("type");
         String[] timeSlots = request.getParameterValues("timeSlots");
@@ -45,6 +47,7 @@ public class ConfirmBookingServlet extends HttpServlet {
             return;
         }
 
+
         HttpSession session = request.getSession();
         Integer adminUserId = (Integer) session.getAttribute("userId");
         String userRole = (String) session.getAttribute("role"); // Get role from session
@@ -53,6 +56,10 @@ public class ConfirmBookingServlet extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
+
+
+// Booking limit logic (only applies to non-admin users)
+
 
         List<Integer> opponentEmpIds = new ArrayList<>();
         for (String opponentName : opponentNames) {

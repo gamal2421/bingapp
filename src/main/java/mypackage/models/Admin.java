@@ -93,41 +93,42 @@ public void bookForOthers(int empId, Date gameDate, String gameType, int slotId)
 
 
     // View report of bookings 
-    public static List<Map<String, String>> viewReport(Date date) {
-        List<Map<String, String>> reportList = new ArrayList<>();
-        String sql = "SELECT " +
-                     "b.booking_id,s.start_time || '-' || s.end_time AS slot_time, " +
-                     "STRING_AGG(e.first_name || ' ' || e.last_name, ' : ' ORDER BY e.first_name) AS players , b.status " +
-                     "FROM emp_master_data e " +
-                     "JOIN emp_booking eb ON e.emp_id = eb.emp_id " +
-                     "JOIN booking_game b ON eb.book_id = b.booking_id " +
-                     "JOIN slots s ON b.slot_id = s.slot_id " +
-                     "WHERE b.game_date = ? " +
-                     "GROUP BY b.booking_id, s.start_time, s.end_time, b.status " +
-                     "ORDER BY s.start_time";
+   public static List<Map<String, String>> viewReport(Date date) {
+    List<Map<String, String>> reportList = new ArrayList<>();
+    String sql = "SELECT " +
+                 "b.booking_id, s.start_time || '-' || s.end_time AS slot_time, " +
+                 "STRING_AGG(e.first_name || ' ' || e.last_name, ' : ' ORDER BY e.first_name) AS players, b.status " +
+                 "FROM emp_master_data e " +
+                 "JOIN emp_booking eb ON e.emp_id = eb.emp_id " +
+                 "JOIN booking_game b ON eb.book_id = b.booking_id " +
+                 "JOIN slots s ON b.slot_id = s.slot_id " +
+                 "WHERE b.game_date = ? " +
+                 "AND b.status != 'cancelled' " +   // <-- Added condition here
+                 "GROUP BY b.booking_id, s.start_time, s.end_time, b.status " +
+                 "ORDER BY s.start_time";
 
-        try (Connection conn = DataBase.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = DataBase.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setDate(1, new java.sql.Date(date.getTime()));
-            ResultSet rs = stmt.executeQuery();
+        stmt.setDate(1, new java.sql.Date(date.getTime()));
+        ResultSet rs = stmt.executeQuery();
 
-          while (rs.next()) {
-    Map<String, String> record = new HashMap<>();
-    record.put("slot_time", rs.getString("slot_time"));
-    record.put("players", rs.getString("players"));
-    record.put("status", rs.getString("status"));
-    record.put("booking_id", rs.getString("booking_id"));
+        while (rs.next()) {
+            Map<String, String> record = new HashMap<>();
+            record.put("slot_time", rs.getString("slot_time"));
+            record.put("players", rs.getString("players"));
+            record.put("status", rs.getString("status"));
+            record.put("booking_id", rs.getString("booking_id"));
 
- // new
-    reportList.add(record);
+            reportList.add(record);
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return reportList;
 }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return reportList;
-    }
     
 
   // Modify the time slot for an existing booking

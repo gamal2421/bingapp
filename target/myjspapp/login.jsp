@@ -15,7 +15,10 @@
                 session.setAttribute("userId", user.getId());
                 session.setAttribute("username", user.getFirstName() + " " + user.getLastName());
                 session.setAttribute("email", email);
+                session.setAttribute("gender", user.getGender());
                 session.setAttribute("role", user.getRole());
+                 // Set the full User object in session here:
+                session.setAttribute("loggedInUser", user);
             
                 if ("admin".equalsIgnoreCase(user.getRole())) {
                     response.sendRedirect("homepage_admin.jsp");
@@ -31,6 +34,7 @@
             e.printStackTrace(); // Log the actual database error on the server
         }
     }
+
 %>
 <!DOCTYPE html>
 <html lang="en">

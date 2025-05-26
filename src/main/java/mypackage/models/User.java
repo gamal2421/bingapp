@@ -3,7 +3,9 @@ package mypackage.models;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mypackage.utl.DataBase;
 
@@ -187,6 +189,19 @@ public class User {
             e.printStackTrace();
         }
     }
+    public void confirmBooking(int bookingId) {
+    try (Connection conn = DataBase.getConnection()) {
+        String updateSql = "UPDATE booking_game SET status = 'confirmed' WHERE booking_id = ?";
+        try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+            updateStmt.setInt(1, bookingId);
+            updateStmt.executeUpdate();
+            System.out.println("Booking confirmed for booking_id: " + bookingId);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
     // Method to show booked game slots
     public List<Booking> showBookedSlots(int empId) {
         List<Booking> bookings = new ArrayList<>();
@@ -233,6 +248,31 @@ public class User {
         }
         return empId;
     }
+    public static List<Map<String, Object>> getGamesPerDayForEmployee(int empId) {
+    List<Map<String, Object>> list = new ArrayList<>();
+    String sql = "SELECT b.game_date, COUNT(b.booking_id) AS games_booked " +
+                 "FROM booking_game b " +
+                 "JOIN emp_booking eb ON b.booking_id = eb.book_id " +
+                 "WHERE eb.emp_id = ? " +
+                 "GROUP BY b.game_date " +
+                 "ORDER BY b.game_date";
+    try (Connection conn = DataBase.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setInt(1, empId);
+        ResultSet rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("game_date", rs.getDate("game_date"));
+            map.put("games_booked", rs.getInt("games_booked"));
+            list.add(map);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+}
 
     // Getter and setter methods for the User fields
     public int getId() {
