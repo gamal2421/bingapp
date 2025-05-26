@@ -44,6 +44,7 @@
   <title>Profile & Available Slots</title>
   <link rel="stylesheet" href="styles\profile_admin.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
   <div class="navbar">
@@ -65,10 +66,10 @@
                 <img src="uploads/<%= session.getAttribute("avatar") != null ? session.getAttribute("avatar") : "avatar.jpeg" %>" alt="Profile" />
             </div>
             <div class="info">
-                <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "johndoe" %></h3>
-                <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "johndoe@example.com" %></p>
+                 <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "NO User Name" %></h3>
+                <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "No Email" %></p>
             </div>
-            <button class="edit-icon" onclick="openEditModal()">✎</button>
+            <button class="edit-icon">✎</button>
         </div>
     </div>
 
@@ -112,12 +113,16 @@
                 <td><%= booking.getGameType() %></td>
                 <td><%= booking.getStatus() %></td>
 
-                <td>
-                    <form method="post" action="profile_admin.jsp" style="display:inline;">
-                        <input type="hidden" name="deleteBookingId" value="<%= booking.getBookingId() %>">
-                        <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
-                    </form>
-                </td>
+             <td>
+    <% if ("Pending".equalsIgnoreCase(booking.getStatus())) { %>
+        <form method="post" action="profile_admin.jsp" style="display:inline;">
+            <input type="hidden" name="deleteBookingId" value="<%= booking.getBookingId() %>">
+            <button type="submit" class="delete-icon-btn" onclick="return confirm('Are you sure you want to delete this booking?')">
+                <i class="fas fa-trash"></i>
+            </button>
+        </form>
+    <% } %>
+</td>
             </tr>
             <% } %>
         </table>
@@ -126,7 +131,7 @@
 
   </div>
 
-<div class="modal" id="editModal">
+<%-- <div class="modal" id="editModal">
   <div class="modal-content">
       <span class="close-btn" onclick="closeEditModal()">×</span>
       <h2>Edit Profile</h2>
@@ -154,11 +159,11 @@
 </form>
 
   </div>
-</div>
+</div> --%>
 </div>
 
   <script>
-    const modal = document.getElementById("editModal");
+   /* const modal = document.getElementById("editModal");
   
     function openModal() {
       modal.style.display = "flex";
@@ -175,7 +180,7 @@
     }
   
     // This is where you call the function on the button click
-    document.querySelector(".edit-icon").addEventListener("click", openModal);
+    document.querySelector(".edit-icon").addEventListener("click", openModal);*/
   </script>
   
 </body>

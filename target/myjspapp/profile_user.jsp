@@ -24,7 +24,7 @@
                 userForDeletion.cancelBooking(bookingId);
                 
                 // Optional: Refresh the page after deletion
-                response.sendRedirect("profile_admin.jsp");
+                response.sendRedirect("profile_user.jsp");
                 return;
             } else {
                 out.println("User not logged in.");
@@ -42,8 +42,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile & Available Slots</title>
-  <link rel="stylesheet" href="styles\profile_admin.css">
+  <link rel="stylesheet" href="styles\profile_user.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 <body>
   <div class="navbar">
@@ -111,13 +113,18 @@
                 <td><%= booking.getEndTime() %></td>
                 <td><%= booking.getGameType() %></td>
                 <td><%= booking.getStatus() %></td>
+<td>
+    <% if ("Pending".equalsIgnoreCase(booking.getStatus())) { %>
+        <form method="post" action="profile_user.jsp" style="display:inline;">
+            <input type="hidden" name="deleteBookingId" value="<%= booking.getBookingId() %>">
+            <button type="submit" class="delete-icon-btn" onclick="return confirm('Are you sure you want to delete this booking?')">
+                <i class="fas fa-trash"></i>
+            </button>
+        </form>
+    <% } %>
+</td>
 
-                <td>
-                    <form method="post" action="profile_admin.jsp" style="display:inline;">
-                        <input type="hidden" name="deleteBookingId" value="<%= booking.getBookingId() %>">
-                        <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
-                    </form>
-                </td>
+
             </tr>
             <% } %>
         </table>
