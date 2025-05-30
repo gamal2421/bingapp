@@ -89,15 +89,16 @@
   // Prepare map from full name to gender
   List<String> allEmployees = user != null ? user.getAllEmployeeFullNames() : Collections.emptyList();
   Map<String, String> nameToGender = new HashMap<>();
+List<String> femaleEmployees = user.getAllFemaleFullNames();
 
-  if (user != null) {
-    for (String emp : allEmployees) {
-      String gender = user.getGenderByFullName(emp);
-      if (gender != null) {
-        nameToGender.put(emp, gender);
-      }
-    }
+for (String emp : allEmployees) {
+  if (femaleEmployees.contains(emp)) {
+    nameToGender.put(emp, "female");
+  } else {
+    nameToGender.put(emp, "male");
   }
+}
+
   // Remove logged-in user from opponent list
   if (username != null) {
     nameToGender.remove(username.trim());
@@ -192,6 +193,26 @@
   const loggedInUser = "<%= loggedInUserFullName %>";
   console.log("Logged in user full name:", loggedInUser);
   let opponentType = "Squad";
+   function triggerCalendar() {
+  const dateInput = document.getElementById("date");
+  // Check if Flatpickr is already initialized
+  if (dateInput._flatpickr) {
+      dateInput._flatpickr.open();
+  } else {
+      // If not initialized yet, initialize it and then open
+      flatpickr(dateInput, {
+          minDate: new Date(),
+          maxDate: new Date(new Date().setDate(new Date().getDate() + 7)),  // <-- add missing closing parenthesis here
+          dateFormat: "Y-m-d",
+          disable: [
+              function(date) {
+                  return date.getDay() === 5 || date.getDay() === 6;
+              }
+          ]
+      }).open();
+  }
+}
+
 
     // Initialize Flatpickr right after DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
@@ -400,25 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return true;
   } 
 
- function triggerCalendar() {
-    const dateInput = document.getElementById("date");
-    // Check if Flatpickr is already initialized
-    if (dateInput._flatpickr) {
-        dateInput._flatpickr.open();
-    } else {
-        // If not initialized yet, initialize it and then open
-        flatpickr(dateInput, {
-            minDate: new Date(),
-            maxDate: new Date(new Date().setDate(new Date().getDate() + 7),
-            dateFormat: "Y-m-d",
-            disable: [
-                function(date) {
-                    return date.getDay() === 5 || date.getDay() === 6;
-                }
-            ]
-        }).open();
-    }
-}
+
 
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -481,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
 
-  const loggedInUser = "<%= loggedInUserFullName %>";
+ 
   console.log("Logged in user full name:", loggedInUser);
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -567,3 +570,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+ 
+
+﻿

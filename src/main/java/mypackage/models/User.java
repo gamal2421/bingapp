@@ -81,22 +81,21 @@ public class User {
     
         return fullNames;
     }
-public String getGenderByFullName(String fullName) {
-    String gender = null;
-    String sql = "SELECT gender FROM emp_master_data WHERE (first_name || ' ' || last_name) = ?";
+public List<String> getAllFemaleFullNames() {
+    List<String> femaleNames = new ArrayList<>();
+    String sql = "SELECT first_name || ' ' || last_name AS full_name FROM emp_master_data WHERE gender = 'Female'";
+    
     try (Connection conn = DataBase.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
          
-        stmt.setString(1, fullName);
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                gender = rs.getString("gender");
-            }
+        while (rs.next()) {
+            femaleNames.add(rs.getString("full_name"));
         }
     } catch (SQLException e) {
         e.printStackTrace();
     }
-    return gender;
+    return femaleNames;
 }
 
 
