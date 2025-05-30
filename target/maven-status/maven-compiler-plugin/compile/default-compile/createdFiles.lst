@@ -8,3 +8,4 @@ mypackage\models\GameSlot.class
 mypackage\servlets\ConfirmBookingServlet.class
 mypackage\models\RegularEmployee.class
 mypackage\models\GameResult.class
+mypackage\servlets\CheckBookingLimitServlet.class

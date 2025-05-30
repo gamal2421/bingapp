@@ -5,7 +5,7 @@ body {
   }
   
   .navbar {
-    background: linear-gradient(to right, #2e7d32, #1b5e20);
+      background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
     display: flex;
     justify-content: space-between;
     align-items: center;

@@ -46,9 +46,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
+<style>
+.navbar {
+    background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+</style>
 <body>
   <div class="navbar">
-    <div class="logo">KTG</div>
+     <img style="width:100px" src="logo.png" alt="Logo" class="logo">
     <div class="nav-links">
       <a href="homepage_admin.jsp">Home</a>
       <a href="booking_admin.jsp">Book</a>

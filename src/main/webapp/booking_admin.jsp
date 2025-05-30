@@ -10,12 +10,10 @@
   <meta charset="UTF-8">
   <title>Booking</title>
 
-  <link rel="stylesheet" href="styles/booking_admin.css">
+  <link rel="stylesheet" href="styles/booking_user.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  
-
 <%
 User user = (User) session.getAttribute("loggedInUser");
 
@@ -29,7 +27,7 @@ if (user != null && user.getGender() != null) {
    
   
 
-
+    // Remove the logged-in user from the list, trimming and ignoring case
     List<String> toRemove = new ArrayList<>();
     for (String emp : employeeNames) {
         if (emp.trim().equalsIgnoreCase(username.trim())) {
@@ -42,7 +40,41 @@ if (user != null && user.getGender() != null) {
 
 <!-- Your CSS here (same as you provided) -->
 <style>
-  /* (Keeping your CSS here as it is) */
+.navbar {
+    background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255,255,255,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #ccc;
+  border-top-color: #1b5e20;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
 </style>
 
 </head>
@@ -50,7 +82,7 @@ if (user != null && user.getGender() != null) {
 
 <!-- Navbar -->
 <div class="navbar">
-  <div class="logo">KTG</div>
+  <img style="width:100px" src="logo.png" alt="Logo" class="logo">
   <div class="nav-links">
     <a href="homepage_admin.jsp">Home</a>
     <a href="booking_admin.jsp">Book</a>
@@ -58,6 +90,12 @@ if (user != null && user.getGender() != null) {
     <a href="report.jsp">Report</a>
   </div>
 </div>
+<% if (request.getAttribute("errorMessage") != null) { %>
+    <div style="color: red; font-weight: bold; padding: 10px;">
+        <%= request.getAttribute("errorMessage") %>
+    </div>
+<% } %>
+
 
 <!-- Main Section -->
 <div class="main-section">
@@ -94,9 +132,10 @@ if (user != null && user.getGender() != null) {
             <p>Please pick a date to see available time slots</p>
           </div>
 
-          <div class="opponent-scroll" id="opponentContainer">
+         <div class="opponent-scroll" id="opponentContainer" style="display: none;">
+
             <label for="searchOpponent" class="search-opponent-label">Search Opponent</label>
-            <input type="text" id="searchOpponent" placeholder="Search opponent..." onkeyup="filterOpponents()">
+           <input type="text" id="searchOpponent" placeholder="Search opponent..." onkeyup="filterOpponents()" disabled>
             <div id="opponentList"></div>
           </div>
 
@@ -112,7 +151,7 @@ if (user != null && user.getGender() != null) {
 
 <!-- JavaScript -->
 <script>
- const gender = "<%= userGender %>";
+  const gender = "<%= userGender %>";
   const players = [
     <% for (String name : employeeNames) { %>
       "<%= name %>",
@@ -121,6 +160,7 @@ if (user != null && user.getGender() != null) {
 
   let opponentType = "Squad";
 
+  document.addEventListener("DOMContentLoaded", function () {
   flatpickr("#date", {
     minDate: new Date(),
     maxDate: new Date(new Date().setDate(new Date().getDate() + 7)),
@@ -145,6 +185,7 @@ if (user != null && user.getGender() != null) {
       }
     }
   });
+});
 
   function updateOpponentSelect() {
   const type = document.getElementById("type").value;
@@ -175,54 +216,6 @@ if (user != null && user.getGender() != null) {
     container.appendChild(select);
   } else {
     players.forEach(player => {
-      const label = document.createElement("label");
-      label.classList.add("opponent-checkbox");
-      label.setAttribute("data-name", player.toLowerCase());
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.name = "opponents";
-      checkbox.value = player;
-
-      checkbox.addEventListener("change", function () {
-        const checked = container.querySelectorAll("input[name='opponents']:checked");
-        if (checked.length > 3) {
-          this.checked = false;
-          alert("Select up to 3 partners only.");
-        }
-      });
-
-      label.appendChild(checkbox);
-      label.append(" " + player);
-      container.appendChild(label);
-    });
-  }
-}
-
-function filterOpponents() {
-  const query = document.getElementById("searchOpponent").value.toLowerCase();
-  const container = document.getElementById("opponentList");
-  container.innerHTML = "";
-
-  const filtered = players.filter(player => player.toLowerCase().includes(query));
-
-  if (opponentType === "Double") { // ✅ Fix here
-    const select = document.createElement("select");
-    select.name = "opponent";
-    select.required = true;
-    select.size = 5;
-    select.classList.add("scrollable-select", 'green-border'); // Add green-border class
-
-    filtered.forEach(player => {
-      const option = document.createElement("option");
-      option.value = player;
-      option.textContent = player;
-      select.appendChild(option);
-    });
-
-    container.appendChild(select);
-  } else {
-    filtered.forEach(player => {
       const label = document.createElement("label");
       label.classList.add("opponent-checkbox");
       label.setAttribute("data-name", player.toLowerCase());
@@ -307,8 +300,7 @@ function filterOpponents() {
   }
 
 
-
-  function validateForm() {
+function validateForm() {
   const type = document.getElementById("type").value;
   const date = document.getElementById("date").value;
   const selectedTimeSlots = document.querySelectorAll("input[name='timeSlots']:checked");
@@ -329,9 +321,24 @@ function filterOpponents() {
       alert("In Squad, you must select exactly 3 partners.");
       return false;
     }
+    const selectedOpponentList = Array.from(selectedOpponents).map(cb => cb.value);
+    console.log("Selected Opponents:", selectedOpponentList); // ✅ This should now show
+  }
+
+  if (type === "Double") {
+    const opponentSelect = document.querySelector("select[name='opponent']");
+    const selectedOpponent = opponentSelect?.value || null;
+    console.log("Selected Opponent:", selectedOpponent); // ✅ This should also show
   }
 
   return true;
+} 
+
+function triggerCalendar() {
+  const fp = document.getElementById("date")._flatpickr;
+  if (fp) {
+    fp.open();
+  }
 }
 
 
@@ -339,44 +346,156 @@ document.addEventListener('DOMContentLoaded', function() {
     const dateInput = document.getElementById('date');
     const genderSelect = document.getElementById('gender');
 
-    function fetchAvailableSlots() {
-        const selectedDate = dateInput.value;
-        const selectedGender = gender;
+function fetchAvailableSlots() {
+    const selectedDate = dateInput.value;
+    const selectedGender = gender;
+ const loadingOverlay = document.getElementById('loadingOverlay');
 
-        if (!selectedDate) return; // don't fetch if date not selected
+    if (!selectedDate) return;
+     loadingOverlay.style.display = 'flex';
 
-        fetch('GetAvailableSlotsServlet', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'date1=' + encodeURIComponent(selectedDate) + '&gender=' + encodeURIComponent(selectedGender)
-        })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('timeSlotsContainer').innerHTML = data;
-        })
-        .catch(error => console.error('Error fetching slots:', error));
-    }
+    fetch('GetAvailableSlotsServlet', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'date1=' + encodeURIComponent(selectedDate) + '&gender=' + encodeURIComponent(selectedGender)
+    })
+    .then(response => response.text())
+    .then(data => {
+        const slotContainer = document.getElementById('timeSlotsContainer');
+        slotContainer.innerHTML = data;
 
-    dateInput.addEventListener('change', fetchAvailableSlots);
-  // fetch when gender changes too!
-});
+        // Initially disable and hide opponent section
+        const opponentSearch = document.getElementById('searchOpponent');
+        const opponentContainer = document.getElementById('opponentContainer');
+        opponentSearch.disabled = true;
+        opponentContainer.style.display = 'none';
 
-
-
-
-function triggerCalendar() {
-  var date = document.getElementById("date")
-  date._flatpickr.open();
+        // Attach event listeners to time slot checkboxes
+        const checkboxes = slotContainer.querySelectorAll("input[name='timeSlots']");
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const selected = slotContainer.querySelectorAll("input[name='timeSlots']:checked");
+                if (selected.length > 0) {
+                    opponentSearch.disabled = false;
+                    opponentContainer.style.display = 'block';
+                    updateOpponentSelect();
+                } else {
+                    opponentSearch.disabled = true;
+                    opponentContainer.style.display = 'none';
+                }
+            });
+        });
+    })
+    .catch(error => console.error('Error fetching slots:', error))
+    .finally(() => {
+        // Hide loader
+        loadingOverlay.style.display = 'none';
+    });
 }
 
 
 
+    dateInput.addEventListener('change', fetchAvailableSlots);
+  // fetch when gender changes too!
+});
+<%
+String loggedInUserFullName = "";
+if (user != null) {
+    String firstName = user.getFirstName() != null ? user.getFirstName().trim() : "";
+    String lastName = user.getLastName() != null ? user.getLastName().trim() : "";
+    loggedInUserFullName = firstName + " " + lastName;
+}
+%>
+
+const loggedInUser = "<%= loggedInUserFullName %>";
+console.log("Logged in user full name:", loggedInUser);
+
+  document.addEventListener('DOMContentLoaded', function () {
+
+    function checkPlayerBookingLimit(empName) {
+      const selectedDate = document.getElementById("date").value;
+      const selectedSlots = document.querySelectorAll("input[name='timeSlots']:checked").length;
+      const loadingOverlay = document.getElementById('loadingOverlay');
+
+      if (!selectedDate || selectedSlots === 0) {
+        return;
+      }
+     loadingOverlay.style.display = 'flex';
+      fetch('CheckBookingLimitServlet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'empName=' + encodeURIComponent(empName) +
+              '&date1=' + encodeURIComponent(selectedDate) +
+              '&numSlots=' + encodeURIComponent(selectedSlots)
+      })
+      .then(response => response.text())
+      .then(result => {
+        if (result.trim() === "false") {
+          alert(empName + " has exceeded the booking limit for this day.");
+
+          // Uncheck Squad checkboxes
+          const checkboxes = document.querySelectorAll("input[name='opponents']");
+          checkboxes.forEach(box => {
+            if (box.value === empName) {
+              box.checked = false;
+            }
+          });
+
+          // Deselect in Double select box
+          const select = document.querySelector("select[name='opponent']");
+          if (select && select.value === empName) {
+            select.value = "";
+          }
+
+          // Uncheck the user's own time slot if this is self-check
+          if (empName === loggedInUser) {
+            const timeSlots = document.querySelectorAll("input[name='timeSlots']:checked");
+            timeSlots.forEach(slot => slot.checked = false);
+          }
+        }
+      })
+  .catch(error => console.error('Error fetching slots:', error))
+    .finally(() => {
+        // Hide loader
+        loadingOverlay.style.display = 'none';
+    });
+    }
+
+    // 🟩 Validate the logged-in user when selecting time slots
+    document.getElementById("timeSlotsContainer").addEventListener("change", function (event) {
+      const target = event.target;
+
+      if (target && target.name === "timeSlots" && target.checked) {
+        checkPlayerBookingLimit(loggedInUser);
+      }
+    });
+
+    // 🟩 Validate opponent selection (Squad & Double)
+    document.getElementById("opponentList").addEventListener("change", function (event) {
+      const target = event.target;
+
+      if (target && (target.name === "opponents" || target.name === "opponent")) {
+        const empName = target.value;
+
+        if (target.checked || target.tagName === "SELECT") {
+          checkPlayerBookingLimit(empName);
+        }
+      }
+});
+
+  });
 
   // Initialize opponent list on load
   window.onload = updateOpponentSelect;
 </script>
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+  <div class="spinner"></div>
+</div>
+
 
 </body>
 </html>

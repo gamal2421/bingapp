@@ -74,7 +74,7 @@ body {
 }
 
 .navbar {
-    background: linear-gradient(to right, #2e7d32, #1b5e20);
+    background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -355,7 +355,7 @@ form {
 </style>
 <body>
     <div class="navbar">
-        <div class="logo">KTG</div>
+       <img style="width:100px" src="logo.png" alt="Logo" class="logo">
         <div class="nav-links">
             <a href="homepage_admin.jsp">Home</a>
             <a href="booking_admin.jsp">Book</a>

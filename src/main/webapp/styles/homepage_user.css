@@ -96,21 +96,26 @@ body {
     overflow-y: auto;
     border-radius: 10px;
     border: 1px solid #ddd;
-    background-color: 	rgba(255, 255, 255, 0.75);
-
-  
+    background-color: rgba(255, 255, 255, 0.75);
 }
 
 .scroll-table table {
     width: 100%;
     border-collapse: collapse;
 }
-
-.scroll-table th, .scroll-table td {
+.scroll-table th,
+.scroll-table td {
     padding: 15px 20px;
     border-bottom: 1px solid #eee;
     font-size: 16px;
+    text-align: center;        /* Horizontal centering */
+    vertical-align: middle;    /* Vertical centering */
+    line-height: 1.5;          /* Ensure consistent height */
 }
+.scroll-table td{
+    margin-left: 20px;
+}
+
 
 .scroll-table th {
     background-color: #2e7d32;
@@ -149,15 +154,14 @@ body {
 }
 
 .image-wrapper {
-width: 100%;
-max-width: 550px;
-height: 532px;
-overflow: hidden;
-border-radius: 20px;
-box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-transition: transform 0.4s ease;
+    width: 100%;
+    max-width: 550px;
+    height: 532px;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    transition: transform 0.4s ease;
 }
-
 
 .main-image {
     width: 100%;
@@ -169,7 +173,7 @@ transition: transform 0.4s ease;
     transform: scale(1.03);
 }
 
-/* Animations */
+
 @keyframes fadeInLeft {
     from {
         opacity: 0;
@@ -192,7 +196,7 @@ transition: transform 0.4s ease;
     }
 }
 
-/* Scrollbar Styling */
+
 .scroll-table::-webkit-scrollbar {
     width: 8px;
 }

@@ -81,6 +81,25 @@ public class User {
     
         return fullNames;
     }
+public String getGenderByFullName(String fullName) {
+    String gender = null;
+    String sql = "SELECT gender FROM emp_master_data WHERE (first_name || ' ' || last_name) = ?";
+    try (Connection conn = DataBase.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+         
+        stmt.setString(1, fullName);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                gender = rs.getString("gender");
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return gender;
+}
+
+
     // Method to book a game slot
     public void book(int empId, Date gameDate, String gameType, int slotId) {
         try (Connection conn = DataBase.getConnection()) {
@@ -229,7 +248,6 @@ public class User {
         return bookings;
     }
     
-
     // Method to get employee ID by full name
     public static int getEmployeeIdByName(String fullName) {
         int empId = -1; // Default to -1 if not found
@@ -248,31 +266,45 @@ public class User {
         }
         return empId;
     }
-    public static List<Map<String, Object>> getGamesPerDayForEmployee(int empId) {
-    List<Map<String, Object>> list = new ArrayList<>();
-    String sql = "SELECT b.game_date, COUNT(b.booking_id) AS games_booked " +
+
+   public static boolean canEmployeeBookSlots(String empName, Date gameDate, int numOfSlots) {
+    int empId = getEmployeeIdByName(empName);
+    if (empId == -1) {
+        System.err.println("Employee not found: " + empName);
+        return false;
+    }
+
+    String sql = "SELECT COUNT(b.booking_id) AS games_booked " +
                  "FROM booking_game b " +
                  "JOIN emp_booking eb ON b.booking_id = eb.book_id " +
-                 "WHERE eb.emp_id = ? " +
-                 "GROUP BY b.game_date " +
-                 "ORDER BY b.game_date";
+                 "WHERE b.game_date = ? AND eb.emp_id = ?";
+
     try (Connection conn = DataBase.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        stmt.setInt(1, empId);
-        ResultSet rs = stmt.executeQuery();
-        
-        while (rs.next()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("game_date", rs.getDate("game_date"));
-            map.put("games_booked", rs.getInt("games_booked"));
-            list.add(map);
+        stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
+        stmt.setInt(2, empId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            int countGames = 0;
+            if (rs.next()) {
+                countGames = rs.getInt("games_booked");
+            }
+
+            // Check if total exceeds limit
+            if (countGames + numOfSlots > 5) {
+                System.err.println("Booking limit exceeded for " + empName + ". Already booked: " + countGames);
+                return false;
+            }
+            return true;
         }
+
     } catch (SQLException e) {
         e.printStackTrace();
+        return false; // On SQL error, deny booking
     }
-    return list;
 }
+
 
     // Getter and setter methods for the User fields
     public int getId() {
