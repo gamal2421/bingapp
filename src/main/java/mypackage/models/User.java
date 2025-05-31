@@ -99,40 +99,42 @@ public List<String> getAllFemaleFullNames() {
 }
 
 
-    // Method to book a game slot
-    public void book(int empId, Date gameDate, String gameType, int slotId) {
-        try (Connection conn = DataBase.getConnection()) {
-            String bookingSql = "INSERT INTO booking_game (game_date, game_type, status, slot_id) VALUES (?, ?, ?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(bookingSql, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
-                stmt.setString(2, gameType);
-                stmt.setString(3, "pending");
-                stmt.setInt(4, slotId);
-                stmt.executeUpdate();
+    // // Method to book a game slot
+    // public void book(int empId, Date gameDate, String gameType, int slotId) {
+    //     try (Connection conn = DataBase.getConnection()) {
+    //         String bookingSql = "INSERT INTO booking_game (game_date, game_type, status, slot_id) VALUES (?, ?, ?, ?)";
+    //         try (PreparedStatement stmt = conn.prepareStatement(bookingSql, Statement.RETURN_GENERATED_KEYS)) {
+    //             stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
+    //             stmt.setString(2, gameType);
+    //             stmt.setString(3, "pending");
+    //             stmt.setInt(4, slotId);
+    //             stmt.executeUpdate();
 
-                ResultSet generatedKeys = stmt.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int bookingId = generatedKeys.getInt(1);
-                    System.out.println("Booking created with ID " + bookingId);
+    //             ResultSet generatedKeys = stmt.getGeneratedKeys();
+    //             if (generatedKeys.next()) {
+    //                 int bookingId = generatedKeys.getInt(1);
+    //                 System.out.println("Booking created with ID " + bookingId);
 
-                    String empBookingSql = "INSERT INTO Emp_booking (emp_id, book_id) VALUES (?, ?)";
-                    try (PreparedStatement empBookingStmt = conn.prepareStatement(empBookingSql)) {
-                        empBookingStmt.setInt(1, empId);
-                        empBookingStmt.setInt(2, bookingId);
-                        empBookingStmt.executeUpdate();
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    //                 String empBookingSql = "INSERT INTO Emp_booking (emp_id, book_id) VALUES (?, ?)";
+    //                 try (PreparedStatement empBookingStmt = conn.prepareStatement(empBookingSql)) {
+    //                     empBookingStmt.setInt(1, empId);
+    //                     empBookingStmt.setInt(2, bookingId);
+    //                     empBookingStmt.executeUpdate();
+    //                 }
+    //             }
+    //         }
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
     // Method to see available game slots for male
     public static List<String[]> seeAvailableSlots(java.util.Date gameDate) {
         List<String[]> slots = new ArrayList<>();
         try (Connection conn = DataBase.getConnection()) {
-            String sql ="SELECT s.slot_id, s.start_time, s.end_time FROM slots s " + //
-                                "WHERE gender_group != 'female' and s.slot_id not in (SELECT slot_id from booking_game where status ='pending' and game_date = ?)";
+            String sql ="SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
+                                "  TO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s \n" + //
+                                "     WHERE gender_group != 'female' and s.slot_id not in \n" + //
+                                " (SELECT slot_id from booking_game where status ='pending' and game_date =? )";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
                 ResultSet rs = stmt.executeQuery();
@@ -153,7 +155,8 @@ public List<String> getAllFemaleFullNames() {
      public static List<String[]> femaleAvailableSlots(java.util.Date gameDate) {
         List<String[]> slots = new ArrayList<>();
         try (Connection conn = DataBase.getConnection()) {
-            String sql ="SELECT s.slot_id, s.start_time, s.end_time FROM slots s " + //
+            String sql ="SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
+                                "  TO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s " + //
                                 "WHERE s.slot_id not in (SELECT slot_id from booking_game where status ='pending' and game_date = ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
@@ -176,7 +179,8 @@ public List<String> getAllFemaleFullNames() {
     public static List<String[]> todayAvailableSlots(java.util.Date gameDate) {
         List<String[]> slots = new ArrayList<>();
         try (Connection conn = DataBase.getConnection()) {
-            String sql = "SELECT s.slot_id, s.start_time, s.end_time FROM slots s " +
+            String sql = "SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
+                                "  TO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s " +
                          "WHERE s.slot_id NOT IN (SELECT slot_id FROM booking_game WHERE game_date = ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setDate(1, new java.sql.Date(gameDate.getTime()));

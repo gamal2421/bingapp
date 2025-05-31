@@ -96,7 +96,7 @@ public void bookForOthers(int empId, Date gameDate, String gameType, int slotId)
    public static List<Map<String, String>> viewReport(Date date) {
     List<Map<String, String>> reportList = new ArrayList<>();
     String sql = "SELECT " +
-                 "b.booking_id, s.start_time || '-' || s.end_time AS slot_time, " +
+                 "b.booking_id, TO_CHAR(s.start_time, 'HH24:MI') || '-' || TO_CHAR(s.end_time, 'HH24:MI') AS slot_time, " +
                  "STRING_AGG(e.first_name || ' ' || e.last_name, ' : ' ORDER BY e.first_name) AS players, b.status " +
                  "FROM emp_master_data e " +
                  "JOIN emp_booking eb ON e.emp_id = eb.emp_id " +
