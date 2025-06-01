@@ -24,14 +24,13 @@ body {
 }
 
 .navbar {
-    background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
+      background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    margin-bottom: 0px;
-}
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
 
 .logo {
     font-size: 28px;
@@ -40,27 +39,29 @@ body {
     letter-spacing: 2px;
 }
 
-.nav-links {
+ .nav-links {
     display: flex;
     align-items: center;
     gap: 25px;
-}
-
-.nav-links a {
+  }
+  
+  .nav-links a {
     text-decoration: none;
     color: #e0f2f1;
     font-weight: 500;
     padding: 10px 20px;
     font-size: 17px;
     border-radius: 8px;
-    transition: background 0.3s ease, color 0.3s ease;
-}
-
-.nav-links a:hover {
-    background: rgba(255, 255, 255, 0.1);
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .nav-links a:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+    background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-}
-
+  }
+  
+  
 .line {
     height: 2px;
     background-color: #c8e6c9;
@@ -234,6 +235,7 @@ body {
         <a href="homepage_user.jsp">Home</a>
         <a href="booking_user.jsp">Book</a>
         <a href="profile_user.jsp">Profile</a>
+        
     </div>
 </nav>
 

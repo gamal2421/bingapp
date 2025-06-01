@@ -94,6 +94,7 @@ if (user != null && user.getGender() != null) {
     <a href="homepage_user.jsp">Home</a>
     <a href="booking_user.jsp">Book</a>
     <a href="profile_user.jsp">Profile</a>
+    
   
   </div>
 </div>

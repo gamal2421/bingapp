@@ -225,8 +225,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 100%;
-    max-width: 500px;
+    width: 250%;
+    height: 100%;
+    max-width: 400px;
   }
   
   .slots-card h2 {
@@ -290,13 +291,7 @@ body {
     border-radius: 8px;
   }
   
-  .profile-slots-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 30px;
-    flex-wrap: wrap;
-    padding: 30px;
-  }
+  
   
   @media (max-width: 768px) {
     .navbar {
@@ -305,15 +300,7 @@ body {
       padding: 15px;
     }
   
-    .profile-card,
-    .slots-card {
-      width: 100%;
-    }
-  
-    .profile-slots-container {
-      flex-direction: column;
-      align-items: center;
-    }
+    
   }
   .delete-icon-btn {
   background-color: #2e7d32;

@@ -10,20 +10,16 @@
 <%@ page import="java.sql.PreparedStatement" %>
 
 <%
-    request.setCharacterEncoding("UTF-8"); // just in case
+    request.setCharacterEncoding("UTF-8");
 
     String deleteBookingIdStr = request.getParameter("deleteBookingId");
     if (deleteBookingIdStr != null) {
         try {
             int bookingId = Integer.parseInt(deleteBookingIdStr);
-
             Integer currentUserId = (Integer) session.getAttribute("userId");
             if (currentUserId != null) {
-                // Create User object (even with dummy data, because we only need the method)
                 User userForDeletion = new User();
                 userForDeletion.cancelBooking(bookingId);
-                
-                // Optional: Refresh the page after deletion
                 response.sendRedirect("profile_user.jsp");
                 return;
             } else {
@@ -36,494 +32,390 @@
     }
 %>
 
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile & Available Slots</title>
-  <link rel="stylesheet" href="styles\profile_user.css">
+  <title>Profile & Bookings</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-</head>
-<style>
-body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  background: linear-gradient(to bottom right, #e8f5e9, #ffffff);
-}
-.big {
-  background-image: url("homepage_photo.png");
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.navbar {
-    background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    
+    .main-content {
+      background-image: url('homepage_photo.png');
+      background-repeat: no-repeat;
+      background-size: cover;
+      min-height: calc(100vh - 70px);
+    }
+    
+   .navbar {
+      background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
-.logo {
-  font-size: 28px;
-  color: #ffffff;
-  font-weight: 700;
-  letter-spacing: 2px;
+    
+    .logo {
+      width: 100px;
+    }
+ .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #e0f2f1;
+    font-weight: 500;
+    padding: 10px 20px;
+    font-size: 17px;
+    border-radius: 8px;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .nav-links a:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+  
+  
+    .container {
+      opacity: 0.9;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      
+    }
+    
+  .profile-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    margin-top: 20px;
+    animation: fadeIn 0.8s ease-in;
 }
 
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 25px;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+    
+    .profile-section {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px; /* Reduced from 30px */
+      padding-bottom: 15px; /* Reduced from 20px */
+      border-bottom: 1px solid #eee;
+    }
+    
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-right: 25px;
+      border: 3px solid #e0e0e0;
+    }
+    
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .user-info h2 {
+      margin: 0;
+      color: #333;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .user-info p {
+      margin: 5px 0 0;
+      color: #777;
+      font-size: 16px;
+    }
+    
+    .section-title {
+      font-size: 20px;
+      color: #1b5e20;
+      margin: 10px 0 15px; /* Adjusted margins */
+      font-weight: 600;
+      padding: 0;
+    }
+    
+    .bookings-content {
+      margin-top: 15px; /* Added to create space between title and table */
+    }
+    
+    .scroll-table {
+      max-height: 300px;
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-top: 15px; /* Added space above table */
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    th {
+      background-color: #2e7d32;
+      color: white;
+      font-weight: 500;
+      position: sticky;
+      top: 0;
+    }
+    
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+    
+  .action-btn {
+    background: none;
+    border: none;
+    color: #2e7d32;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
-.nav-links a {
-  text-decoration: none;
-  color: #e0f2f1;
-  font-weight: 500;
-  padding: 10px 20px;
-  font-size: 17px;
-  border-radius: 8px;
-  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+.action-btn:hover {
+    color: #e53935;
+    transform: scale(1.2);
 }
 
-.nav-links a:hover {
-  transform: scale(1.1);
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+.action-btn:hover i {
+    animation: shake 0.5s ease infinite;
 }
 
-.profile-card {
-  width: 300px;
-  max-width: 100%;
-  margin: 0 auto;
-  margin-top: 30px;
- 
-  margin-left: 50px;
+@keyframes shake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-10deg); }
+    100% { transform: rotate(0deg); }
+}
+    
+    .no-bookings {
+      text-align: center;
+      color: #777;
+      padding: 20px;
+      font-style: italic;
+    }
+    
+    @media (max-width: 768px) {
+      .profile-section {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .avatar {
+        margin-right: 0;
+        margin-bottom: 15px;
+      }
+      
+      th, td {
+        padding: 8px 10px;
+        font-size: 14px;
+      }
+      
+      .container {
+        padding: 0 15px;
+      }
+      
+      .profile-container {
+        padding: 15px;
+      }
+    }
+    tbody tr {
+    transition: all 0.3s ease;
 }
 
-@keyframes fadeInProfile {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+tbody tr:hover {
+    background-color: #f0f7f0 !important;
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-#view-mode {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 15px;
-}
-
-.profile-card .avatar {
-  width: 90px;
-  height: 90px;
-}
-
-.profile-card .avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-  animation: popIn 0.6s ease-out forwards;
-}
-
-@keyframes popIn {
-  0% {
-    transform: scale(0.6);
+tbody tr {
+    animation: fadeInRow 0.5s ease-out forwards;
     opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
 }
 
-.profile-card .info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex-grow: 1;
-  gap: 5px;
+@keyframes fadeInRow {
+    to {
+        opacity: 1;
+    }
 }
 
-.profile-card h3 {
-  font-size: 24px;
-  color: #056605;
-  margin: 0;
-}
-
-.profile-card p {
-  font-size: 16px;
-  color: #777;
-}
-
-.edit-icon {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: #056605;
-  margin-left: auto;
-  transition: transform 0.3s ease;
-}
-
-.edit-icon:hover {
-  color: #2e7d32;
-  transform: scale(1.2);
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  transform: scale(0.95);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.modal.show {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.modal-content {
-  background-color: white;
-  padding: 30px;
-  border-radius: 12px;
-  width: 340px;
-  position: relative;
-}
-
-.modal-content h2 {
-  margin-top: 0;
-  color: #056605;
-}
-
-.modal-content input {
-  width: 100%;
-  padding: 10px;
-  margin: 12px 0;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.modal-content input:focus {
-  outline: none;
-  border-color: #66bb6a;
-  box-shadow: 0 0 5px rgba(102, 187, 106, 0.5);
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.modal-buttons button {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-
-.save {
-  background-color: #388e3c;
-  color: white;
-}
-
-.cancel {
-  background-color: #ccc;
-}
-
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 20px;
-  cursor: pointer;
-  color: #aaa;
-}
-
-.slots-card {
-  width: 90%;
-  max-width: 700px;
-  margin: 0 auto;
-  height: auto;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
-
-.slots-card h2 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1b5e20;
-  margin-bottom: 20px;
-}
-
-.scroll-table {
-  max-height: 300px;
-  overflow-y: auto;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-}
-
-.scroll-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.scroll-table th,
-.scroll-table td {
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-  font-size: 16px;
-}
-
-.scroll-table th {
-  background-color: #2e7d32;
-  color: white;
-}
-
-.scroll-table tr {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: slideFadeIn 0.4s ease forwards;
-}
-
-.scroll-table tr:nth-child(even) {
-  animation-delay: 0.2s;
-}
-
-.scroll-table tr:nth-child(odd) {
-  animation-delay: 0.1s;
-}
-
-@keyframes slideFadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Add delay to each row */
+tbody tr:nth-child(1) { animation-delay: 0.1s; }
+tbody tr:nth-child(2) { animation-delay: 0.2s; }
+tbody tr:nth-child(3) { animation-delay: 0.3s; }
+tbody tr:nth-child(4) { animation-delay: 0.4s; }
+tbody tr:nth-child(5) { animation-delay: 0.5s; }
 .scroll-table::-webkit-scrollbar {
-  width: 8px;
+    width: 8px;
+}
+
+.scroll-table::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
 }
 
 .scroll-table::-webkit-scrollbar-thumb {
-  background-color: #a5d6a7;
-  border-radius: 8px;
+    background: #81c784;
+    border-radius: 10px;
+    transition: background 0.3s;
 }
 
-.profile-slots-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  padding: 30px;
+.scroll-table::-webkit-scrollbar-thumb:hover {
+    background: #4caf50;
 }
-
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 15px;
-  }
-
-  .profile-card,
-  .slots-card {
-    width: 100%;
-  }
-
-  .profile-slots-container {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-.delete-icon-btn {
-  background-color: #2e7d32;
-  border: none;
-  border-radius: 50%;
-  padding: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.delete-icon-btn i {
-  color: white;
-  font-size: 16px;
-}
-
-.delete-icon-btn:hover {
-  background-color: #1b5e20;
-}
-
-.delete-icon-btn:focus {
-  outline: none;
-  box-shadow: 0 0 5px rgba(46, 125, 50, 0.5);
-}
-
-.delete-icon-btn:active {
-  transform: scale(0.95);
-}
-.profile-slots-container {
-  height:400px;
-}
-
-
-
-</style>
+  </style>
+</head>
 <body>
   <div class="navbar">
-   <img style="width:100px" src="logo.png" alt="Logo" class="logo">
+    <img class="logo" src="logo.png" alt="Logo">
     <div class="nav-links">
       <a href="homepage_user.jsp">Home</a>
       <a href="booking_user.jsp">Book</a>
       <a href="profile_user.jsp">Profile</a>
-   
-
+      <a href="login.jsp">Logout</a>
     </div>
   </div>
-  <div class= "big">
 
- 
-
-    <%
-    Integer userId = (Integer) session.getAttribute("userId");
-    if (userId == null) {
-        out.println("User not logged in.");
-        return;
-    }
-
-    String firstName = "firstName";  // Fetch from DB based on userId
-    String lastName = "lastName";    
-    String gender = "gender";     
-    Date dob = new Date();      
-
-    User user = new User(userId, firstName, lastName, gender, dob);
-    List<Booking> bookedSlots = user.showBookedSlots(userId);
-    %>
-
-    <div class="slots-card">
-     <div class="profile-slots-container"> 
-    <div class="profile-card">
-        <div id="view-mode">
-            <div class="avatar">
-                <img src="avatar.png" />
-            </div>
-            <div class="info">
-                <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "NO User Name" %></h3>
-                <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "No Email" %></p>
-            </div>
-            <button class="edit-icon" onclick="openEditModal()">✎</button>
+  <div class="main-content">
+    <div class="container">
+      <div class="profile-container">
+        <!-- Profile Section -->
+        <div class="profile-section">
+          <div class="avatar">
+            <img src="avatar.png" alt="Profile">
+          </div>
+          <div class="user-info">
+            <h2><%= session.getAttribute("username") != null ? session.getAttribute("username") : "NO User Name" %></h2>
+            <p><%= session.getAttribute("email") != null ? session.getAttribute("email") : "No Email" %></p>
+          </div>
         </div>
-    </div>
-    <h2>Booking History</h2>
-    <div class="scroll-table">
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Start time</th>
-                <th>End time</th>
-                <th>Game type</th>
-                 <th>Status</th>
-                 <th>Action</th>
-                 <!-- New column for delete button -->
-            </tr>
-            <% for (Booking booking : bookedSlots) { 
-                java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMMM dd, yyyy");
-                String formattedDate = dateFormat.format(booking.getGameDate());
+        
+        <!-- Bookings Section -->
+        <h2 class="section-title">History</h2>
+        
+        <div class="bookings-content">
+          <div class="scroll-table">
+            <%
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+                out.println("<p>User not logged in.</p>");
+            } else {
+                String firstName = "firstName";
+                String lastName = "lastName";    
+                String gender = "gender";     
+                Date dob = new Date();      
+                
+                User user = new User(userId, firstName, lastName, gender, dob);
+                List<Booking> bookedSlots = user.showBookedSlots(userId);
+                
+                if (bookedSlots.isEmpty()) {
+                    out.println("<p class='no-bookings'>No upcoming bookings found.</p>");
+                } else {
             %>
-            <tr>
-                <td><%= formattedDate %></td>
-                <td><%= booking.getStartTime() %></td>
-                <td><%= booking.getEndTime() %></td>
-                <td><%= booking.getGameType() %></td>
-                <td><%= booking.getStatus() %></td>
-<td>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Start time</th>
+                  <th>End time</th>
+                  <th>Game type</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (Booking booking : bookedSlots) { 
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MMMM dd, yyyy");
+                    String formattedDate = dateFormat.format(booking.getGameDate());
+                %>
+                <tr>
+                  <td><%= formattedDate %></td>
+                  <td><%= booking.getStartTime() %></td>
+                  <td><%= booking.getEndTime() %></td>
+                  <td><%= booking.getGameType() %></td>
+                  <td><%= booking.getStatus() %></td>
+                 <td>
     <% if ("Pending".equalsIgnoreCase(booking.getStatus())) { %>
         <form method="post" action="profile_user.jsp" style="display:inline;">
             <input type="hidden" name="deleteBookingId" value="<%= booking.getBookingId() %>">
-            <button type="submit" class="delete-icon-btn" onclick="return confirm('Are you sure you want to delete this booking?')">
-                <i class="fas fa-trash"></i>
+            <button type="submit" class="action-btn" onclick="return confirm('Are you sure you want to cancel this booking?')">
+                <i class="fas fa-trash-alt" style="color: #2e7d32;"></i>
             </button>
         </form>
     <% } %>
 </td>
-
-
-            </tr>
-            <% } %>
-        </table>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+            <% 
+                }
+            } 
+            %>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-
   </div>
-
-<div class="modal" id="editModal">
-  <div class="modal-content">
-      <span class="close-btn" onclick="closeModal()">×</span>
-      <h2>Edit Profile</h2>
-<form method="post" action="profile_user.jsp" enctype="multipart/form-data">
-    <input type="file" name="avatar" accept="image/*">
-
-    <input 
-      type="text" 
-      name="username" 
-      value="<%= session.getAttribute("username") != null ? session.getAttribute("username") : "NO User Name" %>" 
-      required
-    >
-
-    <input 
-      type="email" 
-      name="email" 
-      value="<%= session.getAttribute("email") != null ? session.getAttribute("email") : "No Email" %>" 
-      readonly
-    >
-
-    <div class="modal-buttons">
-        <button type="button" class="cancel" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="save">Save</button>
-    </div>
-</form>
-
-  </div>
-</div>
-</div>
 
   <script>
-    const modal = document.getElementById("editModal");
-  
-    function openModal() {
-      modal.style.display = "flex";
-      requestAnimationFrame(() => {
-        modal.classList.add("show");
+    // Confirm before canceling booking
+    document.querySelectorAll('.action-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        if (!confirm('Are you sure you want to cancel this booking?')) {
+          e.preventDefault();
+        }
       });
-    }
-  
-    function closeModal() {
-      modal.classList.remove("show");
-      setTimeout(() => {
-        modal.style.display = "none";
-      }, 300);
-    }
-  
-    // This is where you call the function on the button click
-    document.querySelector(".edit-icon").addEventListener("click", openModal);
+    });
   </script>
-  
 </body>
 </html>
 

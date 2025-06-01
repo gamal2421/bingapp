@@ -48,13 +48,13 @@ if (user != null && user.getGender() != null) {
 <!-- Your CSS here (same as you provided) -->
 <style>
 .navbar {
-    background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
+      background: linear-gradient(to right,rgb(133, 216, 137), #1b5e20);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+  }
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -95,6 +95,7 @@ if (user != null && user.getGender() != null) {
     <a href="booking_admin.jsp">Book</a>
     <a href="profile_admin.jsp">Profile</a>
     <a href="manage.jsp">Manage</a>
+    
   </div>
 </div>
 <% if (request.getAttribute("errorMessage") != null) { %>
