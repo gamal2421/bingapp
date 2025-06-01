@@ -100,7 +100,7 @@
     %>
 
     <div class="slots-card">
-    <h2>Upcoming Bookings</h2>
+    <h2>Booking History</h2>
     <div class="scroll-table">
         <table>
             <tr>

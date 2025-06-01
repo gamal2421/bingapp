@@ -430,7 +430,7 @@ body {
             <button class="edit-icon" onclick="openEditModal()">✎</button>
         </div>
     </div>
-    <h2>Upcoming Bookings</h2>
+    <h2>Booking History</h2>
     <div class="scroll-table">
         <table>
             <tr>

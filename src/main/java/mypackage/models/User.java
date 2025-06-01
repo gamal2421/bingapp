@@ -231,9 +231,11 @@ public List<String> getAllFemaleFullNames() {
     public List<Booking> showBookedSlots(int empId) {
         List<Booking> bookings = new ArrayList<>();
         try (Connection conn = DataBase.getConnection()) {
-            String sql = "SELECT b.booking_id, b.game_date, s.start_time, s.end_time, b.game_type, b.status " +
+            String sql = "SELECT b.booking_id, b.game_date, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, "+
+                         "TO_CHAR(s.end_time, 'HH24:MI') AS end_time, b.game_type, b.status " +
                          "FROM booking_game b JOIN slots s ON b.slot_id = s.slot_id " +
-                         "WHERE b.booking_id IN (SELECT book_id FROM Emp_booking WHERE emp_id = ?)";
+                         "WHERE b.booking_id IN (SELECT book_id FROM Emp_booking WHERE emp_id = ?) "+
+                         "ORDER BY b.game_date DESC";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, empId);
                 ResultSet rs = stmt.executeQuery();
