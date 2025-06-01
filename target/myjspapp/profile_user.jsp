@@ -378,6 +378,9 @@ body {
 .delete-icon-btn:active {
   transform: scale(0.95);
 }
+.profile-slots-container {
+  height:400px;
+}
 
 
 
@@ -418,7 +421,7 @@ body {
     <div class="profile-card">
         <div id="view-mode">
             <div class="avatar">
-                <img src="uploads/<%= session.getAttribute("avatar") != null ? session.getAttribute("avatar") : "avatar.jpeg" %>" alt="Profile" />
+                <img src="avatar.png" />
             </div>
             <div class="info">
                 <h3><%= session.getAttribute("username") != null ? session.getAttribute("username") : "NO User Name" %></h3>

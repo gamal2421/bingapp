@@ -233,7 +233,7 @@ body {
         <a href="homepage_admin.jsp">Home</a>
         <a href="booking_admin.jsp">Book</a>
         <a href="profile_admin.jsp">Profile</a>
-        <a href="report.jsp">Report</a>
+        <a href="manage.jsp">Manage</a>
     </div>
 </nav>
 

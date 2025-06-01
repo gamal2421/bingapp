@@ -100,7 +100,7 @@ public class ConfirmBookingServlet extends HttpServlet {
                     bookingStmt.setString(2, gameType);
                     bookingStmt.setString(3, "pending");
                     bookingStmt.setInt(4, slotId);
-                    bookingStmt.addBatch();
+                    bookingStmt.executeUpdate();
 
                     ResultSet generatedKeys = bookingStmt.getGeneratedKeys();
                     int bookingId = -1;
@@ -154,6 +154,5 @@ public class ConfirmBookingServlet extends HttpServlet {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
-    }
+}}
 }

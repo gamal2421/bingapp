@@ -1,6 +1,9 @@
 package mypackage.models;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -307,6 +310,42 @@ public List<String> getAllFemaleFullNames() {
         return false; // On SQL error, deny booking
     }
 }
+ public static boolean addHoliday(Date date) {
+        String sql = "INSERT INTO holidays (day_date) VALUES (?) ON CONFLICT DO NOTHING";
+        try (Connection conn = DataBase.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, (java.sql.Date) date);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ✅ Get all holiday dates as a list of strings (yyyy-MM-dd)
+public static List<String> getDisabledDaysBeforeHolidays() {
+    List<String> disabledDays = new ArrayList<>();
+    String sql = "SELECT day_date FROM holidays";
+
+    try (Connection conn = DataBase.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+            Date holidayDate = rs.getDate("day_date");
+            // Use toLocalDate() instead of toInstant()
+            LocalDate localHoliday = ((java.sql.Date) holidayDate).toLocalDate();
+            LocalDate dayBefore = localHoliday.minusDays(1);
+
+            disabledDays.add(dayBefore.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return disabledDays;
+}
+
+
 
 
     // Getter and setter methods for the User fields
@@ -348,5 +387,6 @@ public List<String> getAllFemaleFullNames() {
 
     public void setDob(Date dob) {
         this.dob = dob;
- }
+    }
 }
+

@@ -3,6 +3,10 @@
 <%@ page import="mypackage.utl.DataBase" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.sql.Date" %>
+<%@ page import="com.google.gson.Gson" %>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -35,6 +39,9 @@ if (user != null && user.getGender() != null) {
         }
     }
     employeeNames.removeAll(toRemove);
+     List<String> holidayList = User.getDisabledDaysBeforeHolidays();
+    String holidayJson = new Gson().toJson(holidayList);
+
 
 %>
 
@@ -87,7 +94,7 @@ if (user != null && user.getGender() != null) {
     <a href="homepage_admin.jsp">Home</a>
     <a href="booking_admin.jsp">Book</a>
     <a href="profile_admin.jsp">Profile</a>
-    <a href="report.jsp">Report</a>
+    <a href="manage.jsp">Manage</a>
   </div>
 </div>
 <% if (request.getAttribute("errorMessage") != null) { %>
@@ -157,34 +164,54 @@ if (user != null && user.getGender() != null) {
       "<%= name %>",
     <% } %>
   ];
+  function formatDateLocal(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months 0-based
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+  }
 
   let opponentType = "Squad";
-
   document.addEventListener("DOMContentLoaded", function () {
-  flatpickr("#date", {
-    minDate: new Date(),
-    maxDate: new Date(new Date().setDate(new Date().getDate() + 7)),
-    dateFormat: "Y-m-d",
-    disable: [
-      function(date) {
-        return date.getDay() === 5 || date.getDay() === 6;
+ const holidays = <%= holidayJson %>;
+flatpickr("#date", {
+  minDate: new Date(),
+  maxDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+  dateFormat: "Y-m-d",
+  disable: [
+    function(date) {
+      const dateStr = date.toISOString().slice(0,10); // format date as YYYY-MM-DD
+      if (date.getDay() === 5 || date.getDay() === 6) { // Friday or Saturday
+        return true;
       }
-    ],
-    onChange: function(selectedDates, dateStr, instance) {
-      const selectedDate = selectedDates[0];
-      const day = selectedDate.getDay();
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (selectedDate < today) {
-        alert("Cannot select a past date.");
-        instance.clear();
-      } else if (day === 5 || day === 6) {
-        alert("Booking not allowed on Fridays or Saturdays.");
-        instance.clear();
+      if (holidays.includes(dateStr)) { // check if in holiday list
+        return true;
       }
+      return false;
     }
-  });
+  ],
+  onChange: function(selectedDates, dateStr, instance) {
+    if (!selectedDates.length) return;
+    const selectedDate = selectedDates[0];
+    const day = selectedDate.getDay();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      alert("Cannot select a past date.");
+      instance.clear();
+    }
+    // These days should already be disabled so this might be redundant:
+    else if (day === 5 || day === 6) {
+      alert("Booking not allowed on Fridays or Saturdays.");
+      instance.clear();
+    } else if (holidays.includes(selectedDate.toISOString().slice(0,10))) {
+      alert("Booking not allowed on holidays.");
+      instance.clear();
+    }
+  }
+});
+
 });
 
   function updateOpponentSelect() {
