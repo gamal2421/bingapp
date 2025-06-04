@@ -383,7 +383,7 @@ tbody tr:nth-child(5) { animation-delay: 0.5s; }
                   <td><%= booking.getGameType() %></td>
                   <td><%= booking.getStatus() %></td>
                  <td>
-    <% if ("Pending".equalsIgnoreCase(booking.getStatus())) { %>
+    <% if ("booked".equalsIgnoreCase(booking.getStatus())) { %>
         <form method="post" action="profile_user.jsp" style="display:inline;">
             <input type="hidden" name="deleteBookingId" value="<%= booking.getBookingId() %>">
             <button type="submit" class="action-btn" onclick="return confirm('Are you sure you want to cancel this booking?')">

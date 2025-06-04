@@ -103,7 +103,7 @@ public void bookForOthers(int empId, Date gameDate, String gameType, int slotId)
                  "JOIN booking_game b ON eb.book_id = b.booking_id " +
                  "JOIN slots s ON b.slot_id = s.slot_id " +
                  "WHERE b.game_date = ? " +
-                 "AND b.status != 'cancelled' " +   // <-- Added condition here
+                  // <-- Added condition here
                  "GROUP BY b.booking_id, s.start_time, s.end_time, b.status " +
                  "ORDER BY s.start_time";
 

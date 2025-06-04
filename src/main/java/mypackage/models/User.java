@@ -137,7 +137,7 @@ public List<String> getAllFemaleFullNames() {
             String sql ="SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
                                 "  TO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s \n" + //
                                 "     WHERE gender_group != 'female' and s.slot_id not in \n" + //
-                                " (SELECT slot_id from booking_game where status ='pending' and game_date =? )";
+                                " (SELECT slot_id from booking_game where status ='booked' and game_date =? )";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
                 ResultSet rs = stmt.executeQuery();
@@ -160,7 +160,7 @@ public List<String> getAllFemaleFullNames() {
         try (Connection conn = DataBase.getConnection()) {
             String sql ="SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
                                 "  TO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s " + //
-                                "WHERE s.slot_id not in (SELECT slot_id from booking_game where status ='pending' and game_date = ?)";
+                                "WHERE s.slot_id not in (SELECT slot_id from booking_game where status ='booked' and game_date = ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
                 ResultSet rs = stmt.executeQuery();

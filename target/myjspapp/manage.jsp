@@ -399,8 +399,8 @@ form {
   <label for="status">Status:</label>
   <select id="status" name="status" onchange="filterTable()">
     <option value="">All</option>
-    <option value="pending" <%= "pending".equals(request.getParameter("status")) ? "selected" : "" %>>Pending</option>
-    <option value="confirmed" <%= "confirmed".equals(request.getParameter("status")) ? "selected" : "" %>>Confirmed</option>
+    <option value="booked" <%= "booked".equals(request.getParameter("status")) ? "selected" : "" %>>Booked</option>
+    <option value="cancelled" <%= "cancelled".equals(request.getParameter("status")) ? "selected" : "" %>>cancelled</option>
   </select>
 </div>
 
@@ -440,7 +440,7 @@ form {
                       <td>
 <%
     String bookingId = record.get("booking_id");
-    if ("Pending".equalsIgnoreCase(status) && bookingId != null) {
+    if ("booked".equalsIgnoreCase(status) && bookingId != null) {
 %>
     <form method="post" action="manage.jsp" style="display:inline;">
     <input type="hidden" name="deleteBookingId" value="<%= bookingId %>" />
@@ -449,15 +449,6 @@ form {
     <button type="submit" class="delete-icon-btn" onclick="return confirm('Are you sure you want to delete this booking?')">
         <i class="fas fa-trash"></i>
     </button>
-</form>
-   <!-- Confirm Booking Form -->
-        <form method="post" action="manage.jsp" style="display:inline;">
-            <input type="hidden" name="confirmBookingId" value="<%= bookingId %>" />
-            <input type="hidden" name="date" value="<%= request.getParameter("date") != null ? request.getParameter("date") : "" %>" />
-            <button type="submit" class="confirm-icon-btn" title="Confirm Booking">
-                <i class="fas fa-check" ></i>
-            </button>
-        </form>
 <%
     } else {
 %>
@@ -486,11 +477,12 @@ form {
         </div>
     </div>
 <h3 style="text-align: center; color:green ;">Select a Holiday</h3>
+<center>
 <form method="post">
     <input type="date" name="day_date" required />
     <button type="submit">Add Holiday</button>
 </form>
-
+</center>
 <% if (successMsg != null) { %>
     <p style="color: green;"><%= successMsg %></p>
 <% } %>
