@@ -31,22 +31,44 @@ public class ConfirmBookingServlet extends HttpServlet {
         String dateStr = request.getParameter("date1");
         String gameType = request.getParameter("type");
         String[] timeSlots = request.getParameterValues("timeSlots");
-        String[] opponentNames;
+        String[] opponentNamesArray;
 
         if ("Double".equals(gameType)) {
-            opponentNames = new String[]{request.getParameter("opponent")};
+            opponentNamesArray = new String[]{request.getParameter("opponent")};
         } else if ("Squad".equals(gameType)) {
-            opponentNames = request.getParameterValues("opponents");
+            opponentNamesArray = request.getParameterValues("opponents");
         } else {
             response.sendRedirect("error.jsp");
             return;
         }
 
-        if (timeSlots == null || timeSlots.length == 0 || opponentNames == null || opponentNames.length == 0) {
+        if (timeSlots == null || timeSlots.length == 0 || opponentNamesArray == null || opponentNamesArray.length == 0) {
             response.sendRedirect("error.jsp");
             return;
         }
 
+        // Convert opponentNamesArray to a List
+        List<String> opponentNames = new ArrayList<>();
+        for(String name : opponentNamesArray) {
+            if (name != null && !name.trim().isEmpty()) {
+                opponentNames.add(name.trim());
+            }
+        }
+
+        // Fetch all opponent employee IDs in a single query
+        java.util.Map<String, Integer> opponentEmpIdsMap = User.getEmployeeIdsByNames(opponentNames);
+
+        List<Integer> opponentEmpIds = new ArrayList<>();
+        for (String opponentName : opponentNames) {
+            Integer empId = opponentEmpIdsMap.get(opponentName);
+            if (empId != null && empId != -1) {
+                opponentEmpIds.add(empId);
+            } else {
+                System.err.println("Opponent not found: " + opponentName);
+                response.sendRedirect("error.jsp");
+                return;
+            }
+        }
 
         HttpSession session = request.getSession();
         Integer adminUserId = (Integer) session.getAttribute("userId");
@@ -60,18 +82,6 @@ public class ConfirmBookingServlet extends HttpServlet {
 
 // Booking limit logic (only applies to non-admin users)
 
-
-        List<Integer> opponentEmpIds = new ArrayList<>();
-        for (String opponentName : opponentNames) {
-            int empId = User.getEmployeeIdByName(opponentName);
-            if (empId != -1) {
-                opponentEmpIds.add(empId);
-            } else {
-                System.err.println("Opponent not found: " + opponentName);
-                response.sendRedirect("error.jsp");
-                return;
-            }
-        }
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date gameDate = null;
@@ -154,5 +164,6 @@ public class ConfirmBookingServlet extends HttpServlet {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-}}
+        }
+    }
 }
