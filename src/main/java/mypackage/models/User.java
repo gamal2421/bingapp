@@ -214,18 +214,6 @@ public List<String> getAllFemaleFullNames() {
             e.printStackTrace();
         }
     }
-    public void confirmBooking(int bookingId) {
-    try (Connection conn = DataBase.getConnection()) {
-        String updateSql = "UPDATE booking_game SET status = 'confirmed' WHERE booking_id = ?";
-        try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
-            updateStmt.setInt(1, bookingId);
-            updateStmt.executeUpdate();
-            System.out.println("Booking confirmed for booking_id: " + bookingId);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
 
     // Method to show booked game slots
     public List<Booking> showBookedSlots(int empId) {
@@ -321,7 +309,7 @@ public List<String> getAllFemaleFullNames() {
     String sql = "SELECT COUNT(b.booking_id) AS games_booked " +
                  "FROM booking_game b " +
                  "JOIN emp_booking eb ON b.booking_id = eb.book_id " +
-                 "WHERE b.game_date = ? AND eb.emp_id = ?";
+                 "WHERE b.status='booked' AND b.game_date = ? AND eb.emp_id = ?";
 
     try (Connection conn = DataBase.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {

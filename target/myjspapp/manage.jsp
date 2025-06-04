@@ -39,27 +39,7 @@
             }
         }
     }
-    String confirmBookingIdStr = request.getParameter("confirmBookingId");
-if (confirmBookingIdStr != null) {
-    try {
-        int bookingId = Integer.parseInt(confirmBookingIdStr);
-        Integer currentUserId = (Integer) session.getAttribute("userId");
-        if (currentUserId != null) {
-            User userConfirm = new User();
-            userConfirm.confirmBooking(bookingId);  // You must implement this method
-
-            // Redirect back to report with same filters
-            String dateParam = request.getParameter("date");
-            response.sendRedirect("manage.jsp?date=" + (dateParam != null ? dateParam : ""));
-            return;
-        } else {
-            out.println("User not logged in.");
-        }
-    } catch (NumberFormatException e) {
-        e.printStackTrace();
-        out.println("Invalid booking ID for confirmation.");
-    }
-}
+   
 String successMsg = null;
     if (request.getMethod().equals("POST")) {
         String holidayStr = request.getParameter("day_date");
@@ -479,7 +459,7 @@ form {
 <h3 style="text-align: center; color:green ;">Select a Holiday</h3>
 <center>
 <form method="post">
-    <input type="date" name="day_date"  />
+    <input type="date" name="day_date"  >
     <button type="submit">Add Holiday</button>
 </form>
 </center>

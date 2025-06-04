@@ -108,7 +108,7 @@ public class ConfirmBookingServlet extends HttpServlet {
                 try (PreparedStatement bookingStmt = conn.prepareStatement(bookingGameSql, Statement.RETURN_GENERATED_KEYS)) {
                     bookingStmt.setDate(1, gameDate);
                     bookingStmt.setString(2, gameType);
-                    bookingStmt.setString(3, "pending");
+                    bookingStmt.setString(3, "booked");
                     bookingStmt.setInt(4, slotId);
                     bookingStmt.executeUpdate();
 
