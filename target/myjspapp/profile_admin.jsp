@@ -361,6 +361,7 @@ tbody tr:nth-child(5) { animation-delay: 0.5s; }
                 } else {
             %>
             <table>
+            
               <thead>
                 <tr>
                   <th>Date</th>

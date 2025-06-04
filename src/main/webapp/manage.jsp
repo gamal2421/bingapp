@@ -13,19 +13,23 @@
                 Integer currentUserId = (Integer) session.getAttribute("userId");
                 if (currentUserId != null) {
                     User userForDeletion = new User();
-                    userForDeletion.cancelBooking(bookingId);
+                    try {
+                        userForDeletion.cancelBooking(bookingId);
+                        // Redirect after successful cancellation
+                        String dateParam = request.getParameter("date");
+                        String nameParam = request.getParameter("name");
+                        String statusParam = request.getParameter("status");
 
-                    // Redirect to the same report page preserving the date filter if present
-                   String dateParam = request.getParameter("date");
-                   String nameParam = request.getParameter("name");
-                   String statusParam = request.getParameter("status");
-
-                    if (dateParam != null && !dateParam.isEmpty()) {
-                        response.sendRedirect("manage.jsp?date=" + dateParam);
-                    } else {
-                        response.sendRedirect("manage.jsp");
+                        if (dateParam != null && !dateParam.isEmpty()) {
+                            response.sendRedirect("manage.jsp?date=" + dateParam);
+                        } else {
+                            response.sendRedirect("manage.jsp");
+                        }
+                        return; // Important: stop further processing after redirect
+                    } catch (Exception cancelException) {
+                        cancelException.printStackTrace();
+                        out.println("Error cancelling booking: " + cancelException.getMessage());
                     }
-                    return; // Important: stop further processing after redirect
                 } else {
                     out.println("User not logged in.");
                 }
@@ -439,14 +443,10 @@ form {
                         <td><%= (status != null ? status : "Unknown") %></td>
                       <td>
 <%
-    String bookingId = record.get("booking_id");
-    if ("booked".equalsIgnoreCase(status) && bookingId != null) {
+    String bookingIdForButton = record.get("booking_id"); // Use a different variable name to avoid conflict
+    if ("booked".equalsIgnoreCase(status) && bookingIdForButton != null) {
 %>
-    <form method="post" action="manage.jsp" style="display:inline;">
-    <input type="hidden" name="deleteBookingId" value="<%= bookingId %>" />
-    <%-- Pass the current date parameter if filtering is active --%>
-    <input type="hidden" name="date" value="<%= request.getParameter("date") != null ? request.getParameter("date") : "" %>" />
-    <button type="submit" class="delete-icon-btn" onclick="return confirm('Are you sure you want to delete this booking?')">
+    <button type="button" class="delete-button" data-booking-id="<%= bookingIdForButton %>" onclick="return confirmAndDelete(<%= bookingIdForButton %>)">
         <i class="fas fa-trash"></i>
     </button>
 <%
@@ -479,7 +479,7 @@ form {
 <h3 style="text-align: center; color:green ;">Select a Holiday</h3>
 <center>
 <form method="post">
-    <input type="date" name="day_date" required />
+    <input type="date" name="day_date"  />
     <button type="submit">Add Holiday</button>
 </form>
 </center>
@@ -518,6 +518,37 @@ function filterTable() {
   });
 }
 
+// Function to handle delete form submission
+function confirmAndDelete(bookingId) {
+  if (confirm('Are you sure you want to delete this booking?')) {
+    // Find the single hidden delete form
+    const deleteForm = document.getElementById('deleteForm');
+    if (deleteForm) {
+      // Set the booking ID in the hidden input
+      document.getElementById('deleteBookingIdHidden').value = bookingId;
+      // Set the date filter value if it exists on the page
+      const dateFilterInput = document.getElementById('date');
+      if (dateFilterInput) {
+         document.getElementById('dateFilterHidden').value = dateFilterInput.value;
+      }
+       // Set the name filter value if it exists on the page
+      const nameFilterInput = document.getElementById('name');
+      if (nameFilterInput) {
+         document.getElementById('nameFilterHidden').value = nameFilterInput.value;
+      }
+       // Set the status filter value if it exists on the page
+      const statusFilterSelect = document.getElementById('status');
+      if (statusFilterSelect) {
+         document.getElementById('statusFilterHidden').value = statusFilterSelect.value;
+      }
+
+      // Submit the form
+      deleteForm.submit();
+    }
+  }
+  return false; // Prevent default button click behavior
+}
+
 // Auto-filter on page load if name input is present
 window.onload = function() {
   if(document.getElementById('name').value || document.getElementById('status').value) {
@@ -530,6 +561,14 @@ document.getElementById('name').addEventListener('input', filterTable);
 document.getElementById('status').addEventListener('change', filterTable);
 
 </script>
+
+<!-- Single hidden form for handling deletions -->
+<form id="deleteForm" method="post" action="manage.jsp" style="display:none;">
+    <input type="hidden" name="deleteBookingId" id="deleteBookingIdHidden" value="" />
+     <input type="hidden" name="date" id="dateFilterHidden" value="" />
+      <input type="hidden" name="name" id="nameFilterHidden" value="" />
+       <input type="hidden" name="status" id="statusFilterHidden" value="" />
+</form>
 
 </body>
 </html>
