@@ -275,42 +275,6 @@ public List<String> getAllFemaleFullNames() {
         return empId;
     }
 
-    // Method to get employee IDs by a list of full names
-    public static Map<String, Integer> getEmployeeIdsByNames(List<String> fullNames) {
-        Map<String, Integer> employeeIds = new HashMap<>();
-        if (fullNames == null || fullNames.isEmpty()) {
-            return employeeIds;
-        }
-
-        // Construct the SQL query with a WHERE IN clause
-        StringBuilder sql = new StringBuilder("SELECT emp_id, first_name || ' ' || last_name AS full_name FROM emp_master_data WHERE first_name || ' ' || last_name IN (");
-        for (int i = 0; i < fullNames.size(); i++) {
-            sql.append("?");
-            if (i < fullNames.size() - 1) {
-                sql.append(", ");
-            }
-        }
-        sql.append(")");
-
-        try (Connection conn = DataBase.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-
-            // Set the parameters for the IN clause
-            for (int i = 0; i < fullNames.size(); i++) {
-                stmt.setString(i + 1, fullNames.get(i));
-            }
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    employeeIds.put(rs.getString("full_name"), rs.getInt("emp_id"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return employeeIds;
-    }
-
    public static boolean canEmployeeBookSlots(String empName, Date gameDate, int numOfSlots) {
     int empId = getEmployeeIdByName(empName);
     if (empId == -1) {
@@ -427,4 +391,3 @@ public static List<String> getDisabledDaysBeforeHolidays() {
         this.dob = dob;
     }
 }
-
