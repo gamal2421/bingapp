@@ -21,16 +21,30 @@ public class GetAvailableSlotsServlet extends HttpServlet {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
 
+        // Retrieve logged-in user from session
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("loggedInUser"); 
+        String season = user.getSeason();
+
         if (dateStr != null && !dateStr.isEmpty()) {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             try {
                 java.util.Date selectedDate = formatter.parse(dateStr);
 
                 List<String[]> slots;
+
                 if ("Male".equalsIgnoreCase(gender)) {
-                    slots = User.seeAvailableSlots(selectedDate); // for Male
+                    if ("Ramadan".equalsIgnoreCase(season)) {
+                        slots = User.seeRamadanAvailableSlots(selectedDate);
+                    } else {
+                        slots = User.seeAvailableSlots(selectedDate);
+                    }
                 } else if ("Female".equalsIgnoreCase(gender)) {
-                    slots = User.femaleAvailableSlots(selectedDate); // for Female
+                    if ("Ramadan".equalsIgnoreCase(season)) {
+                        slots = User.ramadanFemaleAvailableSlots(selectedDate);
+                    } else {
+                        slots = User.femaleAvailableSlots(selectedDate);
+                    }
                 } else {
                     out.println("<p>Invalid gender selected.</p>");
                     return;

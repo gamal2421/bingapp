@@ -20,6 +20,16 @@ public class User {
     protected String gender;
     protected Date dob;
     private String role; // Add this line
+    private String season ="Ramadan";
+
+
+    public String getSeason() {
+        return this.season;
+    }
+
+    public void setSeason(String season) {
+        this.season = season;
+    }
 
     // Getter and Setter for role
     public String getRole() {
@@ -66,6 +76,7 @@ public class User {
         }
         return false;
     }
+
     public List<String> getAllEmployeeFullNames() {
         List<String> fullNames = new ArrayList<>();
         String sql = "SELECT first_name || ' ' || last_name AS full_name FROM emp_master_data";
@@ -84,52 +95,24 @@ public class User {
     
         return fullNames;
     }
-public List<String> getAllFemaleFullNames() {
-    List<String> femaleNames = new ArrayList<>();
-    String sql = "SELECT first_name || ' ' || last_name AS full_name FROM emp_master_data WHERE gender = 'Female'";
-    
-    try (Connection conn = DataBase.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql);
-         ResultSet rs = stmt.executeQuery()) {
-         
-        while (rs.next()) {
-            femaleNames.add(rs.getString("full_name"));
+    public List<String> getAllFemaleFullNames() {
+        List<String> femaleNames = new ArrayList<>();
+        String sql = "SELECT first_name || ' ' || last_name AS full_name FROM emp_master_data WHERE gender = 'Female'";
+        
+        try (Connection conn = DataBase.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                femaleNames.add(rs.getString("full_name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return femaleNames;
     }
-    return femaleNames;
-}
 
 
-    // // Method to book a game slot
-    // public void book(int empId, Date gameDate, String gameType, int slotId) {
-    //     try (Connection conn = DataBase.getConnection()) {
-    //         String bookingSql = "INSERT INTO booking_game (game_date, game_type, status, slot_id) VALUES (?, ?, ?, ?)";
-    //         try (PreparedStatement stmt = conn.prepareStatement(bookingSql, Statement.RETURN_GENERATED_KEYS)) {
-    //             stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
-    //             stmt.setString(2, gameType);
-    //             stmt.setString(3, "pending");
-    //             stmt.setInt(4, slotId);
-    //             stmt.executeUpdate();
-
-    //             ResultSet generatedKeys = stmt.getGeneratedKeys();
-    //             if (generatedKeys.next()) {
-    //                 int bookingId = generatedKeys.getInt(1);
-    //                 System.out.println("Booking created with ID " + bookingId);
-
-    //                 String empBookingSql = "INSERT INTO Emp_booking (emp_id, book_id) VALUES (?, ?)";
-    //                 try (PreparedStatement empBookingStmt = conn.prepareStatement(empBookingSql)) {
-    //                     empBookingStmt.setInt(1, empId);
-    //                     empBookingStmt.setInt(2, bookingId);
-    //                     empBookingStmt.executeUpdate();
-    //                 }
-    //             }
-    //         }
-    //     } catch (SQLException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
     // Method to see available game slots for male
     public static List<String[]> seeAvailableSlots(java.util.Date gameDate) {
         List<String[]> slots = new ArrayList<>();
@@ -154,6 +137,34 @@ public List<String> getAllFemaleFullNames() {
         }
         return slots;
     }
+
+    // Method to see RAMADAN available game slots for male
+    public static List<String[]> seeRamadanAvailableSlots(java.util.Date gameDate) {
+        List<String[]> slots = new ArrayList<>();
+        try (Connection conn = DataBase.getConnection()) {
+            String sql = "SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
+                                "\tTO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s \n" + //
+                                "\tWHERE  s.session_time ='ramadan' AND gender_group != 'female' \n" + //
+                                "\tAND s.slot_id not in \n" + //
+                                "\t(SELECT slot_id from booking_game \n" + //
+                                "\twhere status ='booked' and game_date = ? );";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    int slotId = rs.getInt("slot_id");
+                    String startTime = rs.getString("start_time");
+                    String endTime = rs.getString("end_time");
+                    slots.add(new String[]{startTime, endTime, String.valueOf(slotId)});
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return slots;
+    }
+
      // Method to see available game slots for female
      public static List<String[]> femaleAvailableSlots(java.util.Date gameDate) {
         List<String[]> slots = new ArrayList<>();
@@ -178,6 +189,32 @@ public List<String> getAllFemaleFullNames() {
         return slots;
     }
 
+    // Method to see RAMADAN available game slots for female
+    public static List<String[]> ramadanFemaleAvailableSlots(java.util.Date gameDate) {
+        List<String[]> slots = new ArrayList<>();
+        try (Connection conn = DataBase.getConnection()) {
+            String sql ="SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
+                                "\tTO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s \n" + //
+                                "\tWHERE  s.session_time ='ramadan' AND s.slot_id not in \n" + //
+                                "\t(SELECT slot_id from booking_game \n" + //
+                                "\twhere status ='booked' and game_date = ? )";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    int slotId = rs.getInt("slot_id");
+                    String startTime = rs.getString("start_time");
+                    String endTime = rs.getString("end_time");
+                    slots.add(new String[]{startTime, endTime, String.valueOf(slotId)});
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return slots;
+    }
+
     // Method to see today's available game slots
     public static List<String[]> todayAvailableSlots(java.util.Date gameDate) {
         List<String[]> slots = new ArrayList<>();
@@ -185,6 +222,30 @@ public List<String> getAllFemaleFullNames() {
             String sql = "SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
                                 "  TO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s " +
                          "WHERE s.slot_id NOT IN (SELECT slot_id FROM booking_game WHERE game_date = ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
+                ResultSet rs = stmt.executeQuery();
+                
+                while (rs.next()) {
+                    String startTime = rs.getString("start_time");
+                    String endTime = rs.getString("end_time");
+                    slots.add(new String[]{startTime, endTime});
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return slots;
+    }
+
+    // Method to see RAMADAN today's available game slots
+    public static List<String[]> ramadanTodayAvailableSlots(java.util.Date gameDate) {
+        List<String[]> slots = new ArrayList<>();
+        try (Connection conn = DataBase.getConnection()) {
+            String sql = "SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time,\n" + //
+                                "\tTO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s\n" + //
+                                "\tWHERE s.session_time ='ramadan' AND s.slot_id NOT IN \n" + //
+                                "\t(SELECT slot_id FROM booking_game WHERE game_date = ? )";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
                 ResultSet rs = stmt.executeQuery();
