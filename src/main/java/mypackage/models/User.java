@@ -144,7 +144,7 @@ public class User {
         try (Connection conn = DataBase.getConnection()) {
             String sql = "SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
                                 "\tTO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s \n" + //
-                                "\tWHERE  s.session_time ='ramadan' AND gender_group != 'female' \n" + //
+                                "\tWHERE  s.season_time ='ramadan' AND gender_group != 'female' \n" + //
                                 "\tAND s.slot_id not in \n" + //
                                 "\t(SELECT slot_id from booking_game \n" + //
                                 "\twhere status ='booked' and game_date = ? );";
@@ -195,7 +195,7 @@ public class User {
         try (Connection conn = DataBase.getConnection()) {
             String sql ="SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time, \n" + //
                                 "\tTO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s \n" + //
-                                "\tWHERE  s.session_time ='ramadan' AND s.slot_id not in \n" + //
+                                "\tWHERE  s.season_time ='ramadan' AND s.slot_id not in \n" + //
                                 "\t(SELECT slot_id from booking_game \n" + //
                                 "\twhere status ='booked' and game_date = ? )";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -244,7 +244,7 @@ public class User {
         try (Connection conn = DataBase.getConnection()) {
             String sql = "SELECT s.slot_id, TO_CHAR(s.start_time, 'HH24:MI') AS start_time,\n" + //
                                 "\tTO_CHAR(s.end_time, 'HH24:MI') AS end_time FROM slots s\n" + //
-                                "\tWHERE s.session_time ='ramadan' AND s.slot_id NOT IN \n" + //
+                                "\tWHERE s.season_time ='ramadan' AND s.slot_id NOT IN \n" + //
                                 "\t(SELECT slot_id FROM booking_game WHERE game_date = ? )";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setDate(1, new java.sql.Date(gameDate.getTime()));
